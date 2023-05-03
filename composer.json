@@ -12,6 +12,6 @@
     }
   },
   "bin": [
-    "src/command/console.php"
+    "src/command/langdonglei"
   ]
 }
