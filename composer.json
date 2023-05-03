@@ -4,8 +4,22 @@
     "php": ">=7.4.0",
     "symfony/console": "^5.4",
     "ext-zip": "*",
-    "symfony/var-dumper": "^5.4"
+    "symfony/var-dumper": "^5.4",
+    "topthink/framework": "dev-master"
   },
+  "config": {
+    "preferred-install": "dist",
+    "allow-plugins": {
+      "easywechat-composer/easywechat-composer": true,
+      "topthink/think-installer": true
+    }
+  },
+  "repositories": [
+    {
+      "type": "git",
+      "url": "https://gitee.com/fastadminnet/framework.git"
+    }
+  ],
   "autoload": {
     "psr-4": {
       "langdonglei\\util\\": "src"
