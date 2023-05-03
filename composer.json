@@ -1,0 +1,16 @@
+{
+  "name": "langdonglei/util",
+  "require": {
+    "php": ">=7.4.0",
+    "symfony/console": "^5.4",
+    "ext-zip": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "langdonglei\\util\\": "src"
+    }
+  },
+  "bin": [
+    "src/command/console.php"
+  ]
+}

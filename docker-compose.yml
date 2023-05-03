@@ -1,0 +1,5 @@
+services:
+  dev:
+    image: langdonglei/dev
+    volumes:
+      - './:/www'
