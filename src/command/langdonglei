@@ -1,4 +1,4 @@
-#!/usr/bin/env php
+#!/usr/local/bin/php
 <?php
 
 use langdonglei\util\command\fastadmin\addon\Install;
@@ -9,7 +9,7 @@ $root = dirname(__DIR__);
 var_dump(1);
 if (!is_file($root . '/vendor/autoload.php')) {
     var_dump(2);
-    $root = dirname(__DIR__, 3);
+    $root = dirname(__DIR__, 4);
 }
 var_dump($root);exit();
 require_once $root . '/vendor/autoload.php';
