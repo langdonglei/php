@@ -7,8 +7,9 @@ use Symfony\Component\Console\Application;
 
 $root = dirname(__DIR__);
 if (!is_file($root . '/vendor/autoload.php')) {
-    $root = dirname(__DIR__, 2);
+    $root = dirname(__DIR__, 3);
 }
+var_dump($root);exit();
 require_once $root . '/vendor/autoload.php';
 
 $application = new Application();
