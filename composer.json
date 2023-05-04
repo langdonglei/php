@@ -1,5 +1,6 @@
 {
   "name": "langdonglei/util",
+  "type": "project",
   "require": {
     "php": ">=7.4.0",
     "symfony/console": "^5.4",
