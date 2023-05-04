@@ -11,10 +11,9 @@ if (!is_file($root . '/vendor/autoload.php')) {
 }
 
 define("ROOT_PATH", $root);
-define("DS", DIRECTORY_SEPARATOR);
 
-require ROOT_PATH . '/vendor/autoload.php';
 require ROOT_PATH . '/thinkphp/base.php';
+require ROOT_PATH . '/vendor/autoload.php';
 
 $application = new Application();
 $application->add(new Install());
