@@ -27,6 +27,11 @@ class Copy extends Command
             File::cp($assets, ROOT_PATH . '/public/assets/addons/' . $addon_name);
         }
 
+        $public = $addon_path . '/public';
+        if (is_dir($public)) {
+            File::cp($public, ROOT_PATH . '/public');
+        }
+
         $application = $addon_path . '/application';
         if (is_dir($application)) {
             File::cp($application, ROOT_PATH . '/application');
