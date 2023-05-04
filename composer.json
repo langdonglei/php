@@ -5,7 +5,8 @@
     "symfony/console": "^5.4",
     "ext-zip": "*",
     "symfony/var-dumper": "^5.4",
-    "topthink/framework": "dev-master"
+    "topthink/framework": "dev-master",
+    "nelexa/zip": "^4.0"
   },
   "config": {
     "preferred-install": "dist",
