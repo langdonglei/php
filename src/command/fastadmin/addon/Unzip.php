@@ -8,19 +8,19 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use think\console\input\Argument;
 
-class Zip extends Command
+class Unzip extends Command
 {
     protected function configure()
     {
         $this
-            ->addArgument('target', Argument::REQUIRED, 'the target you will zip')
+            ->addArgument('target', Argument::REQUIRED, 'the target you will unzip')
             ->setName('fastadmin:addon:zip');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $target = $input->getArgument('target');
-        File::zip($target);
+        File::unzip($target);
         return 0;
     }
 }

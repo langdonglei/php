@@ -2,6 +2,7 @@
 <?php
 
 use langdonglei\util\command\fastadmin\addon\Install;
+use langdonglei\util\command\fastadmin\addon\Unzip;
 use langdonglei\util\command\fastadmin\addon\Zip;
 use Symfony\Component\Console\Application;
 
@@ -18,4 +19,5 @@ require ROOT_PATH . '/vendor/autoload.php';
 $application = new Application();
 $application->add(new Install());
 $application->add(new Zip());
+$application->add(new Unzip());
 $application->run();
