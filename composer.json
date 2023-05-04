@@ -26,6 +26,6 @@
     }
   },
   "bin": [
-    "src/command/ll"
+    "src/command/vv"
   ]
 }
