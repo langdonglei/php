@@ -14,7 +14,7 @@ class Unzip extends Command
     {
         $this
             ->addArgument('target', Argument::REQUIRED, 'the target you will unzip')
-            ->setName('fastadmin:addon:zip');
+            ->setName('fastadmin:addon:unzip');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
