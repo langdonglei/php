@@ -10,6 +10,28 @@ use ZipArchive;
 
 class File
 {
+    public static function cp($source, $dest)
+    {
+        if (!is_dir($dest)) {
+            mkdir($dest, 0755, true);
+        }
+        foreach (
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($source, RecursiveDirectoryIterator::SKIP_DOTS),
+                RecursiveIteratorIterator::SELF_FIRST
+            ) as $item
+        ) {
+            if ($item->isDir()) {
+                $sontDir = $dest . DS . $iterator->getSubPathName();
+                if (!is_dir($sontDir)) {
+                    mkdir($sontDir, 0755, true);
+                }
+            } else {
+                copy($item, $dest . DS . $iterator->getSubPathName());
+            }
+        }
+    }
+
     public static function clear($dir)
     {
         if (file_exists($dir)) {
@@ -84,5 +106,14 @@ class File
         $zipFile->openFile($target);
         $zipFile->extractTo($out);
         $zipFile->close();
+    }
+
+    public static function touch($file, $content = '')
+    {
+        $info = pathinfo($file);
+        if (!is_dir($info['dirname'])) {
+            mkdir($info['dirname'], 0777, true);
+        }
+        file_put_contents($file, $content);
     }
 }

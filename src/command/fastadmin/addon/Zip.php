@@ -13,14 +13,19 @@ class Zip extends Command
     protected function configure()
     {
         $this
-            ->addArgument('target', Argument::REQUIRED, 'the target you will zip')
+            ->addArgument('addon_name', Argument::REQUIRED)
             ->setName('fastadmin:addon:zip');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $target = $input->getArgument('target');
-        File::zip($target);
+        $addon_name = $input->getArgument('addon_name');
+        $addon_path = ROOT_PATH . '/addons/' . $addon_name;
+//        $info    = parse_ini_file('info.ini');
+//        $name    = $info['name'];
+//        $version = $info['version'];
+//        $zip     = ROOT_PATH . 'runtime/zz/' . $name . '-' . $version . '.zip';
+        File::zip($addon_path, $addon_path . '.zip');
         return 0;
     }
 }

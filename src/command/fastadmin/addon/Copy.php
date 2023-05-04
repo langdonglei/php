@@ -8,20 +8,30 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use think\console\input\Argument;
 
-class Unzip extends Command
+class Copy extends Command
 {
     protected function configure()
     {
         $this
             ->addArgument('addon_name', Argument::REQUIRED)
-            ->setName('fastadmin:addon:unzip');
+            ->setName('fastadmin:addon:copy');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $addon_name = $input->getArgument('addon_name');
         $addon_path = ROOT_PATH . '/addons/' . $addon_name;
-        File::unzip($addon_path . '.zip', $addon_path);
+
+        $assets = $addon_path . '/assets';
+        if (is_dir($assets)) {
+            File::cp($assets, ROOT_PATH . '/public/assets/addons/' . $addon_name);
+        }
+
+        $application = $addon_path . '/application';
+        if (is_dir($application)) {
+            File::cp($application, ROOT_PATH . '/application');
+        }
+
         return 0;
     }
 }

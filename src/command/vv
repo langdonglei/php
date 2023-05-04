@@ -1,7 +1,11 @@
 #!/usr/local/bin/php
 <?php
 
+use langdonglei\util\command\fastadmin\addon\Copy;
 use langdonglei\util\command\fastadmin\addon\Install;
+use langdonglei\util\command\fastadmin\addon\Js;
+use langdonglei\util\command\fastadmin\addon\Debug;
+use langdonglei\util\command\fastadmin\addon\Sql;
 use langdonglei\util\command\fastadmin\addon\Unzip;
 use langdonglei\util\command\fastadmin\addon\Zip;
 use Symfony\Component\Console\Application;
@@ -15,9 +19,14 @@ define("ROOT_PATH", $root_path);
 
 require ROOT_PATH . '/thinkphp/base.php';
 require ROOT_PATH . '/vendor/autoload.php';
+require ROOT_PATH . '/vendor/topthink/framework/helper.php';
 
 $application = new Application();
-$application->add(new Install());
 $application->add(new Zip());
 $application->add(new Unzip());
+$application->add(new Sql());
+$application->add(new Copy());
+$application->add(new Js());
+$application->add(new Install());
+$application->add(new Debug());
 $application->run();
