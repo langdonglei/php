@@ -1,6 +1,6 @@
 <?php
 
-namespace langdonglei\util\library;
+namespace langdonglei\util;
 
 class Map
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace langdonglei\util\library;
+namespace langdonglei\util;
 
 use Exception;
 use PhpZip\ZipFile;
