@@ -83,6 +83,20 @@ class Wechat2
         }
         $str .= "key=$key";
         return md5($str);
+
+        //所有请求参数按照字母先后顺序排
+        ksort($arr);
+        //定义字符串开始所包括的字符串
+        $stringToBeSigned = '';
+        //把所有参数名和参数值串在一起
+        foreach ($params as $k => $v) {
+            $stringToBeSigned .= urldecode($k . $v);
+        }
+        unset($k, $v);
+        //定义字符串结尾所包括的字符串
+        $stringToBeSigned .= '&key=rvxazd4qghgYjnkqihu1mdkiSizgkslx';
+        //使用MD5进行加密，再转化成大写
+        return strtoupper(md5($stringToBeSigned));
     }
 
     public static function toXml($data): string
@@ -98,5 +112,74 @@ class Wechat2
     {
         libxml_disable_entity_loader();
         return json_decode(json_encode(simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA), JSON_UNESCAPED_UNICODE), true);
+    }
+
+    public function transfer($data)
+    {
+        header("Content-type: text/html; charset=utf-8");
+        //CA证书及支付信息
+        $config             = get_addon_config('wxjssdk');
+        $wxchat['appid']    = $config['appid'];
+        $wxchat['mchid']    = $config['mchid']; //商户号
+        $wxchat['api_cert'] = __DIR__ . '/weixin/apiclient_cert.pem';
+        $wxchat['api_key']  = __DIR__ . '/weixin/apiclient_key.pem';
+
+        $webdata = array(
+            'mch_appid'        => $wxchat['appid'],
+            'mchid'            => $wxchat['mchid'],
+            'nonce_str'        => md5(time()),
+            //商户订单号，需要唯一
+            'partner_trade_no' => $data['pay_code'],
+            //转账用户的openid
+            'openid'           => $data['openid'],
+            ////OPTION_CHECK不强制校验真实姓名, FORCE_CHECK：强制 NO_CHECK：
+            'check_name'       => 'NO_CHECK',
+            //付款金额单位为分
+            'amount'           => $data['money'] * 100,
+            'desc'             => $data['desc'],
+            'spbill_create_ip' => $_SERVER['SERVER_ADDR'],
+        );
+
+        foreach ($webdata as $k => $v) {
+            $tarr[] = $k . '=' . $v;
+        }
+
+        sort($tarr);
+        $sign            = implode($tarr, '&');
+        $sign            .= '&key=rvxazd4qghgYjnkqihu1mdkiSizgkslx';
+        $webdata['sign'] = strtoupper(md5($sign));
+
+        $wget = $this->array2xml($webdata);
+
+        $pay_url = 'https://api.mch.weixin.qq.com/mmpaymkttransfers/promotion/transfers';
+
+        $res = $this->http_post($pay_url, $wget, $wxchat);
+
+        if (!$res) {
+            return array('status' => 1, 'msg' => "Can't connect the server");
+        }
+
+        $content = simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOCDATA);
+
+        if (strval($content->return_code) == 'FAIL') {
+            return array('status' => 1, 'msg' => strval($content->return_msg));
+        }
+        if (strval($content->result_code) == 'FAIL') {
+            return array('status' => 1, 'msg' => strval($content->err_code), ':' . strval($content->err_code_des));
+        }
+
+        $rdata = array(
+            'status'           => 0,
+            'mch_appid'        => strval($content->mch_appid),
+            'mchid'            => strval($content->mchid),
+            'device_info'      => strval($content->device_info),
+            'nonce_str'        => strval($content->nonce_str),
+            'result_code'      => strval($content->result_code),
+            'partner_trade_no' => strval($content->partner_trade_no),
+            'payment_no'       => strval($content->payment_no),
+            'payment_time'     => strval($content->payment_time),
+        );
+
+        return $rdata;
     }
 }
