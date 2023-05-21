@@ -1,5 +1,5 @@
 {
-  "name": "langdonglei/util",
+  "name": "langdonglei/php",
   "require": {
     "php": ">=7.4.0",
     "symfony/console": "^5.4",
@@ -30,6 +30,6 @@
     }
   },
   "bin": [
-    "src/command/vv"
+
   ]
 }
