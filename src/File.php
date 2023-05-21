@@ -122,7 +122,7 @@ class File
         if (empty($_FILES['vv'])) {
             throw new Exception('vv empty');
         }
-        $files = $_FILES['file'];
+        $files = $_FILES['vv'];
         $r = [];
         for ($i = 0; $i < count($files['name']); $i++) {
             $name = $files['name'][$i];
