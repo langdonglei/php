@@ -29,6 +29,7 @@
       "langdonglei\\": "src"
     }
   },
+  "minimum-stability": "dev",
   "bin": [
 
   ]
