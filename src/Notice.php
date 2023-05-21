@@ -1,6 +1,6 @@
 <?php
 
-namespace langdonglei\util;
+namespace langdonglei;
 use GuzzleHttp\Client;
 
 class Notice

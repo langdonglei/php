@@ -1,14 +1,11 @@
 <?php
 
-namespace langdonglei\util;
+namespace langdonglei;
 
-use app\common\exception\UploadException;
-use app\common\library\Upload;
 use Exception;
 use PhpZip\ZipFile;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
-use think\Config;
 use ZipArchive;
 
 class File
@@ -120,7 +117,7 @@ class File
         file_put_contents($file, $content);
     }
 
-    public function upload(): array
+    public static function upload(): array
     {
         if (empty($_FILES['file'])) {
             throw new Exception('file empty');
