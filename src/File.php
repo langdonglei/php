@@ -2,10 +2,13 @@
 
 namespace langdonglei\util;
 
+use app\common\exception\UploadException;
+use app\common\library\Upload;
 use Exception;
 use PhpZip\ZipFile;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use think\Config;
 use ZipArchive;
 
 class File
@@ -84,7 +87,7 @@ class File
         );
         foreach ($iterator as $file) {
             if (!$file->isDir()) {
-                $filePath     = $file->getRealPath();
+                $filePath = $file->getRealPath();
                 $relativePath = str_replace(DIRECTORY_SEPARATOR, '/', substr($filePath, strlen($target)));
                 if (!in_array($file->getFilename(), $exclude)) {
                     $zipArchive->addFile($filePath, $relativePath);
@@ -115,5 +118,22 @@ class File
             mkdir($info['dirname'], 0777, true);
         }
         file_put_contents($file, $content);
+    }
+
+    public function upload(): array
+    {
+        if (empty($_FILES['file'])) {
+            throw new Exception('file empty');
+        }
+        $files = $_FILES['file'];
+        $r = [];
+        for ($i = 0; $i < count($files['name']); $i++) {
+            $name = $files['name'][$i];
+            $tmp_name = $files['tmp_name'][$i];
+            $save_name = 'uploads/' . time() . $name;
+            move_uploaded_file($tmp_name, $save_name);
+            $r[] = $save_name;
+        }
+        return $r;
     }
 }
