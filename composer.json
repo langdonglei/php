@@ -5,7 +5,6 @@
     "symfony/console": "^5.4",
     "ext-zip": "*",
     "symfony/var-dumper": "^5.4",
-    "topthink/framework": "dev-master",
     "nelexa/zip": "^3",
     "karsonzhang/fastadmin-addons": "~1.2.4",
     "ext-json": "*",
@@ -29,7 +28,6 @@
       "langdonglei\\": "src"
     }
   },
-  "minimum-stability": "dev",
   "bin": [
 
   ]
