@@ -120,7 +120,7 @@ class File
     public static function upload(): array
     {
         if (empty($_FILES['vv'])) {
-            throw new Exception('file empty');
+            throw new Exception('vv empty');
         }
         $files = $_FILES['file'];
         $r = [];
