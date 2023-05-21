@@ -127,10 +127,11 @@ class File
         for ($i = 0; $i < count($files['name']); $i++) {
             $name = $files['name'][$i];
             $tmp_name = $files['tmp_name'][$i];
-            $save_name = 'uploads/' . time() . $name;
+            $save_name = '/uploads/' . time() . $name;
             move_uploaded_file($tmp_name, $save_name);
             $r[] = $save_name;
         }
+
         return $r;
     }
 }
