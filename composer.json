@@ -6,9 +6,7 @@
     "ext-zip": "*",
     "symfony/var-dumper": "^5.4",
     "nelexa/zip": "^3",
-    "karsonzhang/fastadmin-addons": "~1.2.4",
-    "ext-json": "*",
-    "guzzlehttp/guzzle": "~6.5"
+    "ext-json": "*"
   },
   "config": {
     "preferred-install": "dist",
