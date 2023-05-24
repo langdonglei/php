@@ -21,4 +21,32 @@ class Map
         return floatval(sprintf('%.2f', $s * 1000));
     }
 
+    public function near($lng, $lat, $table, $limit = 3,$lng_field = 'lng' , $lat_field = 'lat')
+    {
+        $sql = <<<EOF
+SELECT
+	*,
+	SQRT(
+		POW( 69.1 * ( $lat_field - [ $lat ]), 2 ) + POW( 69.1 * ([ $lng ] - $lng_field ) * COS( $lat_field / 57.3 ), 2 ) 
+	) AS distance 
+FROM
+	$table 
+WHERE
+	MBRContains (
+		LINESTRING (
+			POINT ([ $lat ] - 1 / 69.1,
+				[ $lng ] - 1 /(
+				69.1 * COS([ $lat ]* 0.01745 ))),
+			POINT ([ $lat ] + 1 / 69.1,
+				[ $lng ] + 1 /(
+				69.1 * COS([ $lat ]* 0.01745 ))) 
+		),
+		POINT ( $lat_field, $lng_field ) 
+	) 
+ORDER BY
+	distance 
+	LIMIT $limit;
+EOF;
+    }
+
 }
