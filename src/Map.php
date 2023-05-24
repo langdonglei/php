@@ -21,32 +21,29 @@ class Map
         return floatval(sprintf('%.2f', $s * 1000));
     }
 
-    public function near($lng, $lat, $table, $limit = 3,$lng_field = 'lng' , $lat_field = 'lat')
+    public function suggestByTencent($word, $key, $secret = '')
     {
-        $sql = <<<EOF
-SELECT
-	*,
-	SQRT(
-		POW( 69.1 * ( $lat_field - [ $lat ]), 2 ) + POW( 69.1 * ([ $lng ] - $lng_field ) * COS( $lat_field / 57.3 ), 2 ) 
-	) AS distance 
-FROM
-	$table 
-WHERE
-	MBRContains (
-		LINESTRING (
-			POINT ([ $lat ] - 1 / 69.1,
-				[ $lng ] - 1 /(
-				69.1 * COS([ $lat ]* 0.01745 ))),
-			POINT ([ $lat ] + 1 / 69.1,
-				[ $lng ] + 1 /(
-				69.1 * COS([ $lat ]* 0.01745 ))) 
-		),
-		POINT ( $lat_field, $lng_field ) 
-	) 
-ORDER BY
-	distance 
-	LIMIT $limit;
-EOF;
-    }
+        if (empty($word)) {
+            return [];
+        }
+        $url    = 'https://apis.map.qq.com';
+        $path   = '/ws/place/v1/suggestion?';
+        $client = new Client();
 
+        if (empty($secret)) {
+            $str = $client->get($url . $path . "key=$key&region=$word&keyword=$word")->getBody()->getContents();
+        } else {
+            $str = '';
+        }
+        $arr = json_decode($str, true);
+        return array_reduce($arr['data'], function ($carry, $item) {
+            $carry[] = [
+                'id'   => $item['id'],
+                'name' => $item['address'],
+                'lng'  => $item['location']['lng'],
+                'lat'  => $item['location']['lat'],
+            ];
+            return $carry;
+        }, []);
+    }
 }
