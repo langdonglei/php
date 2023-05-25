@@ -2,6 +2,8 @@
 
 namespace langdonglei;
 
+use GuzzleHttp\Client;
+
 class Map
 {
     const PI           = 3.1415926535898;
