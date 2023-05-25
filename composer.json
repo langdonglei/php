@@ -6,7 +6,8 @@
     "ext-zip": "*",
     "symfony/var-dumper": "^5.4",
     "nelexa/zip": "^3",
-    "ext-json": "*"
+    "ext-json": "*",
+    "guzzlehttp/guzzle": "^6"
   },
   "config": {
     "preferred-install": "dist",
