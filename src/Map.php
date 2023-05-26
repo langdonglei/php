@@ -38,6 +38,9 @@ class Map
             $str = '';
         }
         $arr = json_decode($str, true);
+        if ($arr['status'] && $arr['message'] !== 0) {
+            throw new \Exception($arr['message'] ?? 'error');
+        }
         return array_reduce($arr['data'], function ($carry, $item) {
             $carry[] = [
                 'id'   => $item['id'],
