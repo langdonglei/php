@@ -39,7 +39,7 @@ class Map
         }
         $arr = json_decode($str, true);
         if ($arr['status'] && $arr['message'] !== 0) {
-            throw new \Exception($arr['message'] ?? 'error');
+            throw new \Exception($arr['message'] ?? 'error_');
         }
         return array_reduce($arr['data'], function ($carry, $item) {
             $carry[] = [
