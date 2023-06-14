@@ -74,7 +74,7 @@ class Wechat2
         return self::fromXml($xml);
     }
 
-    public static function sign($arr, $key): string
+    public static function sign($arr, $key): Str
     {
         ksort($arr);
         $str = '';
@@ -99,7 +99,7 @@ class Wechat2
         return strtoupper(md5($stringToBeSigned));
     }
 
-    public static function toXml($data): string
+    public static function toXml($data): Str
     {
         $xml = '<xml>';
         foreach ($data as $key => $val) {
