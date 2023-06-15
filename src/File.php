@@ -12,6 +12,7 @@ class File
 {
     public static function cp($source, $dest)
     {
+        # test
         if (!is_dir($dest)) {
             mkdir($dest, 0755, true);
         }
