@@ -6,7 +6,7 @@ class Str
 {
     public static function domain($str)
     {
-        if (str_starts_with($str, 'http') || str_starts_with($str, 'data:image')) {
+        if (!$str || str_starts_with($str, 'http') || str_starts_with($str, 'data:image')) {
             return $str;
         }
         $scheme = $_SERVER['REQUEST_SCHEME'];
