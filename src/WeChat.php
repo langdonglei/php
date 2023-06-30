@@ -2,32 +2,61 @@
 
 namespace langdonglei;
 
+use Exception;
 use GuzzleHttp\Client;
+use think\Env;
 
 class WeChat
 {
-    public static function getAccessCode($appid,$secret): string
+    protected $mini_app_id;
+    protected $mini_app_secret;
+    /**
+     * @var mixed
+     */
+    protected      $access_token;
+    private Client $client;
+
+    /**
+     * @throws Exception
+     */
+    public function __construct()
     {
-        $api    = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$appid&secret=$secret";
-        $str    = (new Client())->request('post', $api)->getBody()->getContents();
-        $arr    = json_decode($str, true);
-        return $arr['access_token'];
+        $mini_app_id = Env::get('wechat.mini_app_id');
+        if (!$mini_app_id) {
+            throw new Exception('未配置环境变量 wechat.mini_app_id');
+        }
+        $this->mini_app_id = $mini_app_id;
+
+        $mini_app_secret = Env::get('wechat.mini_app_secret');
+        if (!$mini_app_secret) {
+            throw new Exception('未配置环境变量 wechat.mini_app_secret');
+        }
+        $this->mini_app_secret = $mini_app_secret;
+        $this->client          = new Client();
+        $str                   = $this->client->post("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$this->mini_app_id&secret=$this->mini_app_secret")->getBody()->getContents();
+        $arr                   = json_decode($str, true);
+        $this->access_token    = $arr['access_token'];
     }
 
-    public static function getUnlimitedQRCode($access_token, $scene = ''): string
+    public function getUnlimitedQRCode($scene, $return_content = true): string
     {
-        $api = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=$access_token";
-        return (new Client())->request('post', $api, [
+        $content = $this->client->post("https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=$this->access_token", [
             'json' => [
                 'scene' => $scene,
             ]
         ])->getBody()->getContents();
+        if ($return_content) {
+            return $content;
+        } else {
+            $path = File::getSaveName();
+            file_put_contents($path, $content);
+            return $path;
+        }
     }
 
-    public static function generateShortLink($access_token, $page_url = 'pages/index/index'): string
+    public function generateShortLink($page_url = 'pages/index/index'): string
     {
-        $api = "https://api.weixin.qq.com/wxa/genwxashortlink?access_token=$access_token";
-        $str = (new Client())->request('post', $api, [
+        $str = $this->client->post("https://api.weixin.qq.com/wxa/genwxashortlink?access_token=$this->access_token", [
             'json' => [
                 'page_url' => $page_url,
             ]
