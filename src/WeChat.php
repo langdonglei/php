@@ -38,8 +38,11 @@ class WeChat
         $this->access_token    = $arr['access_token'];
     }
 
-    public function getUnlimitedQRCode($scene, $return_content = true): string
+    public function getUnlimitedQRCode($scene, $return_content = false): string
     {
+        if($scene){
+            throw new Exception('scene 不能为空');
+        }
         $content = $this->client->post("https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=$this->access_token", [
             'json' => [
                 'scene' => $scene,
@@ -48,7 +51,7 @@ class WeChat
         if ($return_content) {
             return $content;
         } else {
-            $path = File::getSaveName();
+            $path = File::getSaveName('qrcode');
             file_put_contents($path, $content);
             return $path;
         }
