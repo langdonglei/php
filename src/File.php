@@ -10,10 +10,17 @@ use ZipArchive;
 
 class File
 {
+    public static function getSaveName($flag = 'tmp'): string
+    {
+        $dir = "uploads/$flag/" . date('Ymd');
+        if (!is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
+        return $dir . '/' . md5(microtime(true)) . '.png';
+    }
+
     public static function cp($source, $dest)
     {
-        # test
-        # test
         if (!is_dir($dest)) {
             mkdir($dest, 0755, true);
         }

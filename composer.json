@@ -8,7 +8,8 @@
     "nelexa/zip": "^3",
     "ext-json": "*",
     "guzzlehttp/guzzle": "^6",
-    "ext-gd": "*"
+    "ext-gd": "*",
+    "endroid/qrcode": "^4.6"
   },
   "config": {
     "preferred-install": "dist",

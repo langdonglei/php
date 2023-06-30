@@ -17,18 +17,11 @@ class WeChat
     public static function getUnlimitedQRCode($access_token, $scene = ''): string
     {
         $api = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=$access_token";
-        $str = (new Client())->request('post', $api, [
+        return (new Client())->request('post', $api, [
             'json' => [
-                'scene' => 1,
+                'scene' => $scene,
             ]
         ])->getBody()->getContents();
-        $dir = 'uploads/tmp/' . date('Ymd');
-        if (!is_dir($dir)) {
-            mkdir($dir, 0777, true);
-        }
-        $path = $dir . '/' . md5(microtime(true)) . '.png';
-        file_put_contents($path, $str);
-        return $path;
     }
 
     public static function generateShortLink($access_token, $page_url = 'pages/index/index'): string
