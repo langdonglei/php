@@ -40,7 +40,7 @@ class WeChat
 
     public function getUnlimitedQRCode($scene, $return_content = false): string
     {
-        if($scene){
+        if (!$scene) {
             throw new Exception('scene 不能为空');
         }
         $content = $this->client->post("https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=$this->access_token", [
