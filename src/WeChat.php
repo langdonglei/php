@@ -38,6 +38,10 @@ class WeChat
         $this->access_token    = $arr['access_token'];
     }
 
+
+    /**
+     * @throws Exception
+     */
     public function getUnlimitedQRCode($scene, $return_content = false): string
     {
         if (!$scene) {
