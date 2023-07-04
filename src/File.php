@@ -93,7 +93,7 @@ class File
         );
         foreach ($iterator as $file) {
             if (!$file->isDir()) {
-                $filePath = $file->getRealPath();
+                $filePath     = $file->getRealPath();
                 $relativePath = str_replace(DIRECTORY_SEPARATOR, '/', substr($filePath, strlen($target)));
                 if (!in_array($file->getFilename(), $exclude)) {
                     $zipArchive->addFile($filePath, $relativePath);
@@ -126,21 +126,17 @@ class File
         file_put_contents($file, $content);
     }
 
-    public static function upload(): array
+    public static function upload($dir, $tag = 'vv'): array
     {
-        if (empty($_FILES['vv'])) {
-            throw new Exception('vv empty');
+        if (empty($_FILES[$tag])) {
+            throw new Exception("$tag empty");
         }
-        $files = $_FILES['vv'];
-        $r = [];
-        for ($i = 0; $i < count($files['name']); $i++) {
-            $name = $files['name'][$i];
-            $tmp_name = $files['tmp_name'][$i];
-            $save_name = 'uploads/' . time() . $name;
-            move_uploaded_file($tmp_name, $save_name);
-            $r[] = '/' . $save_name;
-        }
-
-        return $r;
+        $files = (array)$_FILES['vv']['tmp_name'];
+        return array_reduce($files, function ($carry, $item) use ($dir) {
+            $url = File::getSaveName($dir);
+            move_uploaded_file($item, $url);
+            $carry[] = $url;
+            return $carry;
+        }, []);
     }
 }
