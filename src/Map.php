@@ -9,7 +9,7 @@ class Map
     const PI           = 3.1415926535898;
     const EARTH_RADIUS = 6378.137;
 
-    function distance($lat1, $lng1, $lat2, $lng2): float
+    public static function distance($lat1, $lng1, $lat2, $lng2): float
     {
         $radLat1 = $lat1 * (self::PI / 180);
         $radLat2 = $lat2 * (self::PI / 180);
@@ -21,6 +21,14 @@ class Map
         $s = $s * self::EARTH_RADIUS;
         $s = round($s * 10000) / 10000;
         return floatval(sprintf('%.2f', $s * 1000));
+    }
+
+    public static function selectByDistance($model, $limit, $sort = 'asc', $lng = 'lng', $lat = 'lat')
+    {
+        return $model->field("*,round(st_distance_sphere(point(lng,lat),point($lng,$lat)),2) as distance")
+            ->order('distance', $sort)
+            ->limit($limit)
+            ->select();
     }
 
     public function suggestByTencent($word, $key, $secret = '')
