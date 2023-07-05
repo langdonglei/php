@@ -23,7 +23,7 @@ class Map
         return floatval(sprintf('%.2f', $s * 1000));
     }
 
-    public static function selectByDistance($model, $limit, $sort = 'asc', $lng = 'lng', $lat = 'lat')
+    public static function selectByDistance($model, $limit = 1, $sort = 'asc', $lng = 'lng', $lat = 'lat')
     {
         return $model->field("*,round(st_distance_sphere(point(lng,lat),point($lng,$lat)),2) as distance")
             ->order('distance', $sort)
