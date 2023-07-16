@@ -31,6 +31,14 @@ class Map
             ->select();
     }
 
+    public static function near($model, $limit = 11, $lng = 'lng', $lat = 'lat')
+    {
+        return $model->field("*,round(st_distance_sphere(point(lng,lat),point($lng,$lat)),2) as distance")
+            ->order('distance asc')
+            ->limit($limit)
+            ->select();
+    }
+
     public function suggestByTencent($word, $key, $secret = '')
     {
         if (empty($word)) {
