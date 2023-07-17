@@ -9,11 +9,13 @@ class Str
         if (!$str || str_starts_with($str, 'http') || str_starts_with($str, 'data:image')) {
             return $str;
         }
-        $scheme = $_SERVER['REQUEST_SCHEME'];
-        $host   = $_SERVER['HTTP_HOST'];
-        if (!$scheme || !$host) {
-            return $str;
+        if (function_exists('get_addon_config')) {
+            $config = get_addon_config('alioss');
+            $domain = rtrim($config['cdnurl'] ?? '', '/');
         }
-        return $scheme . '://' . $host . '/' . ltrim($str, '/');
+        if (empty($domain)) {
+            $domain = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'];
+        }
+        return $domain . '/' . ltrim($str, '/');
     }
 }
