@@ -5,6 +5,7 @@ namespace langdonglei;
 use Exception;
 use GuzzleHttp\Client;
 use think\Env;
+use Yansongda\Pay\Pay;
 
 class WeChat
 {
@@ -70,5 +71,34 @@ class WeChat
         ])->getBody()->getContents();
         $arr = json_decode($str, true);
         return $arr['link'];
+    }
+
+    public static function refundByYan($sn, $money)
+    {
+        try {
+            Pay::wechat([
+                'miniapp_id'  => Env::get('wechat.mini_app_id'),
+                'mch_id'      => Env::get('wechat.mini_app_mch_id'),
+                'key'         => Env::get('wechat.mini_app_mch_v2'),
+                'cert_client' => ROOT_PATH . '/cerificate/apiclient_cert.pem',
+                'cert_key'    => ROOT_PATH . '/cerificate/apiclient_key.pem',
+                'http'        => [
+                    'timeout'         => 0,
+                    'connect_timeout' => 0,
+                    'http_errors'     => false,
+                    'verify'          => false
+                ]
+            ])->refund([
+                'type'          => 'miniapp',
+                'out_trade_no'  => $sn,
+                'out_refund_no' => time(),
+                'total_fee'     => $money * 100,
+                'refund_fee'    => $money * 100,
+            ]);
+        } catch (Throwable $e) {
+            preg_match('/(?P<message>[一-龟].*)/u', $e->getMessage(), $matches);
+            $message = $matches['message'];
+        }
+        return $message ?? 'ok';
     }
 }
