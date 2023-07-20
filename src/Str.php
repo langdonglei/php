@@ -4,12 +4,12 @@ namespace langdonglei;
 
 class Str
 {
-    public static function domain($str)
+    public static function domain($str, $must_self = false)
     {
         if (!$str || str_starts_with($str, 'http') || str_starts_with($str, 'data:image')) {
             return $str;
         }
-        if (function_exists('get_addon_config')) {
+        if (!$must_self && function_exists('get_addon_config')) {
             $config = get_addon_config('alioss');
             $domain = rtrim($config['cdnurl'] ?? '', '/');
         }
