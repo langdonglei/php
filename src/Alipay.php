@@ -46,6 +46,9 @@ class Alipay
                 throw new Exception('打款错误');
             }
         }
+        if ($r['code'] != 10000 || $r['msg'] !== 'Success') {
+            throw new Exception($r['sub_msg']);
+        }
         return $r;
     }
 }
