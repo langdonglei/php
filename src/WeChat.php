@@ -103,7 +103,7 @@ class WeChat
         return $message ?? 'ok';
     }
 
-    public static function miniappByYan($callback, $yuan, $sn, $openid, $memo = ''): Collection
+    public static function miniappByYan($openid, $yuan, $sn, $callback, $memo = ''): Collection
     {
         return Pay::wechat([
             'miniapp_id' => Env::get('wechat.mini_app_id'),
