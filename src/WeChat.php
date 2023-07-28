@@ -6,6 +6,7 @@ use Exception;
 use GuzzleHttp\Client;
 use think\Env;
 use Yansongda\Pay\Pay;
+use Yansongda\Supports\Collection;
 
 class WeChat
 {
@@ -100,5 +101,20 @@ class WeChat
             $message = $matches['message'];
         }
         return $message ?? 'ok';
+    }
+
+    public static function miniappByYan($callback, $yuan, $sn, $openid, $memo = ''): Collection
+    {
+        return Pay::wechat([
+            'miniapp_id' => Env::get('wechat.mini_app_id'),
+            'mch_id'     => Env::get('wechat.mini_app_mch_id'),
+            'key'        => Env::get('wechat.mini_app_mch_v2'),
+            'notify_url' => $callback,
+        ])->miniapp([
+            'out_trade_no' => $sn,
+            'body'         => $memo,
+            'total_fee'    => $yuan * 100,
+            'openid'       => $openid,
+        ]);
     }
 }
