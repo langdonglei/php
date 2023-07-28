@@ -118,6 +118,16 @@ class WeChat
         ]);
     }
 
+    public static function verify()
+    {
+        return Pay::wechat([
+            'miniapp_id' => Env::get('wechat.mini_app_id'),
+            'mch_id'     => Env::get('wechat.mini_app_mch_id'),
+            'key'        => Env::get('wechat.mini_app_mch_v2'),
+        ])->verify();
+    }
+
+
     public static function success(): void
     {
         Pay::wechat([
