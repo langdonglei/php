@@ -19,18 +19,11 @@
       "topthink/think-installer": true
     }
   },
-  "repositories": [
-    {
-      "type": "git",
-      "url": "https://gitee.com/fastadminnet/framework.git"
-    }
-  ],
   "autoload": {
     "psr-4": {
       "langdonglei\\": "src"
     }
   },
   "bin": [
-
   ]
 }
