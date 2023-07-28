@@ -74,15 +74,15 @@ class WeChat
         return $arr['link'];
     }
 
-    public static function refundByYan($sn, $money)
+    public static function refundByYan($sn, $money): string
     {
         try {
             Pay::wechat([
                 'miniapp_id'  => Env::get('wechat.mini_app_id'),
                 'mch_id'      => Env::get('wechat.mini_app_mch_id'),
                 'key'         => Env::get('wechat.mini_app_mch_v2'),
-                'cert_client' => ROOT_PATH . '/cerificate/apiclient_cert.pem',
-                'cert_key'    => ROOT_PATH . '/cerificate/apiclient_key.pem',
+                'cert_client' => APP_PATH . '/certificate/apiclient_cert.pem',
+                'cert_key'    => APP_PATH . '/certificate/apiclient_key.pem',
                 'http'        => [
                     'timeout'         => 0,
                     'connect_timeout' => 0,
