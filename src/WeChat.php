@@ -117,4 +117,13 @@ class WeChat
             'openid'       => $openid,
         ]);
     }
+
+    public static function success(): void
+    {
+        Pay::wechat([
+            'miniapp_id' => Env::get('wechat.mini_app_id'),
+            'mch_id'     => Env::get('wechat.mini_app_mch_id'),
+            'key'        => Env::get('wechat.mini_app_mch_v2'),
+        ])->success()->send();
+    }
 }
