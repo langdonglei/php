@@ -1,13 +1,13 @@
 <?php
 
-namespace langdonglei\command\ping;
+namespace langdonglei\command\net;
 
 use think\console\Command;
 use think\console\Input;
 use think\console\input\Argument;
 use think\console\Output;
 
-class Index extends Command
+class Ping extends Command
 {
     protected function configure()
     {
