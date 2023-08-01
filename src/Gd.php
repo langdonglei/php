@@ -193,7 +193,7 @@ class Gd
     /**
      * @throws Throwable
      */
-    public static function posterWithUrl($bg_url, $url, $x = '', $y = ''): string
+    public static function posterWithUrl($bg_url, $url, $x = '', $y = '', $scale = 1): string
     {
         $client = new Client(['http_errors' => false]);
         try {
@@ -214,13 +214,13 @@ class Gd
         } catch (Throwable $e) {
             throw new Exception('没有从参数二获取到资源');
         }
-        return self::poster($bg, $qr, $x, $y);
+        return self::poster($bg, $qr, $x, $y, $scale);
     }
 
-    public static function poster($bg, $qr, $x = '', $y = ''): string
+    public static function poster($bg, $qr, $x = '', $y = '', $scale = 1): string
     {
         # 默认放正中间
-        if ($x == '' || $y == '') {
+        if ($x === '' || $y === '') {
             $x = imagesx($bg) / 2 - imagesx($qr) / 2;
             $y = imagesy($bg) / 2 - imagesy($qr) / 2;
         }
@@ -231,8 +231,8 @@ class Gd
             $y,       # 嵌入图像左上角要放入背景图像的y坐标点
             0,                                         # 嵌入图像的宽度取值x坐标点
             0,                                         # 嵌入图像的高度取值y坐标点
-            imagesx($qr),                              # 嵌入图像在背景图像中要占用的宽度
-            imagesy($qr),                              # 嵌入图像在背景图像中要占用的高度
+            imagesx($qr) * $scale,                              # 嵌入图像在背景图像中要占用的宽度
+            imagesy($qr) * $scale,                              # 嵌入图像在背景图像中要占用的高度
             imagesx($qr),                              # 从嵌入图像坐标点要取的宽度
             imagesy($qr)                               # 从嵌入图像坐标点要取的高度
         );
