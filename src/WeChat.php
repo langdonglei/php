@@ -57,9 +57,9 @@ class WeChat
         if ($return_content) {
             return $content;
         } else {
-            $path = File::getSaveName('qrcode');
-            file_put_contents($path, $content);
-            return $path;
+            $r = File::generateFileName('qrcode', '.png');
+            file_put_contents($r, $content);
+            return $r;
         }
     }
 
