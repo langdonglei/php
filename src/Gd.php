@@ -193,7 +193,7 @@ class Gd
     /**
      * @throws Throwable
      */
-    public static function posterWithUrl($bg_url, $url): string
+    public static function posterWithUrl($bg_url, $url, $x, $y): string
     {
         $client = new Client(['http_errors' => false]);
         try {
@@ -214,7 +214,7 @@ class Gd
         } catch (Throwable $e) {
             throw new Exception('没有从参数二获取到资源');
         }
-        return self::poster($bg, $qr);
+        return self::poster($bg, $qr, $x, $y);
     }
 
     public static function poster($bg, $qr, $x = 0, $y = 0): string
