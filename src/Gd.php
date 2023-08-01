@@ -193,7 +193,7 @@ class Gd
     /**
      * @throws Throwable
      */
-    public static function posterWithUrl($bg_url, $url, $x, $y): string
+    public static function posterWithUrl($bg_url, $url, $x = '', $y = ''): string
     {
         $client = new Client(['http_errors' => false]);
         try {
@@ -217,10 +217,10 @@ class Gd
         return self::poster($bg, $qr, $x, $y);
     }
 
-    public static function poster($bg, $qr, $x = 0, $y = 0): string
+    public static function poster($bg, $qr, $x = '', $y = ''): string
     {
         # 默认放正中间
-        if (!$x || !$y) {
+        if ($x == '' || $y == '') {
             $x = imagesx($bg) / 2 - imagesx($qr) / 2;
             $y = imagesy($bg) / 2 - imagesy($qr) / 2;
         }
