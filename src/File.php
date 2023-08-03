@@ -133,7 +133,7 @@ class File
         }
         $files = (array)$_FILES['vv']['tmp_name'];
         return array_reduce($files, function ($carry, $item) use ($dir) {
-            $url = File::getSaveName($dir);
+            $url = File::generateFileName($dir);
             move_uploaded_file($item, $url);
             $carry[] = $url;
             return $carry;
