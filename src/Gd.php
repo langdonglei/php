@@ -6,6 +6,8 @@ use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
 use Exception;
 use GuzzleHttp\Client;
+use think\exception\HttpResponseException;
+use think\Response;
 use Throwable;
 
 class Gd
@@ -241,5 +243,35 @@ class Gd
         imagedestroy($bg);
         imagedestroy($qr);
         return $r;
+    }
+
+    public static function poster_debug($bg, $qr, $x = 0, $y = 0, $scale = 1)
+    {
+        $client = new Client(['http_errors' => false]);
+        try {
+            $bg = Str::domain($bg);
+            $bg = $client->get($bg)->getBody()->getContents();
+            $bg = @imagecreatefromstring($bg);
+            if (!is_resource($bg)) {
+                throw new Exception();
+            }
+        } catch (Throwable $e) {
+            throw new Exception('没有从参数一获取到资源');
+        }
+        try {
+            $qr = Str::domain($qr);
+            $qr = $client->get($qr)->getBody()->getContents();
+            $qr = @imagecreatefromstring($qr);
+            if (!is_resource($qr)) {
+                throw new Exception();
+            }
+        } catch (Throwable $e) {
+            throw new Exception('没有从参数二获取到资源');
+        }
+        imagecopyresized($bg, $qr, $x, $y, 0, 0, imagesx($qr) * $scale, imagesy($qr) * $scale, imagesx($qr), imagesy($qr));
+        $response = new Response();
+        $response->header('content-type:image/png');
+        imagepng($bg);
+        throw new HttpResponseException($response);
     }
 }
