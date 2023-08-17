@@ -10,15 +10,6 @@ use ZipArchive;
 
 class File
 {
-    public static function getSaveName($flag = 'tmp'): string
-    {
-        $dir = "uploads/$flag/" . date('Ymd');
-        if (!is_dir($dir)) {
-            mkdir($dir, 0777, true);
-        }
-        return $dir . '/' . md5(microtime(true)) . '.png';
-    }
-
     public static function generateFileName($flag = 'tmp', $ext = ''): string
     {
         $dir = "uploads/$flag/" . date('Ymd');
@@ -142,7 +133,7 @@ class File
         }
         $files = (array)$_FILES['vv']['tmp_name'];
         return array_reduce($files, function ($carry, $item) use ($dir) {
-            $url = File::getSaveName($dir);
+            $url = File::generateFileName($dir);
             move_uploaded_file($item, $url);
             $carry[] = $url;
             return $carry;

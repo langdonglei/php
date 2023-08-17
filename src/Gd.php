@@ -2,6 +2,14 @@
 
 namespace langdonglei;
 
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\PngWriter;
+use Exception;
+use GuzzleHttp\Client;
+use think\exception\HttpResponseException;
+use think\Response;
+use Throwable;
+
 class Gd
 {
     public function c($color = 'rand', $alpha = 0)
@@ -31,7 +39,7 @@ class Gd
                 $p = '/[0-9,a-f]{6}/i';
                 if (preg_match_all($p, $color, $r)) {
                     $xx = str_split($r[0][0], 2);
-                    $c = imagecolorallocatealpha($image, hexdec($xx[0]), hexdec($xx[1]), hexdec($xx[2]), $alpha);
+                    $c  = imagecolorallocatealpha($image, hexdec($xx[0]), hexdec($xx[1]), hexdec($xx[2]), $alpha);
                 } else {
                     $c = imagecolorallocatealpha($image, mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 255), $alpha);
                 }
@@ -42,7 +50,7 @@ class Gd
 
     public function thumb($img, $w = 790)
     {
-        $i = imagecreatefromstring(file_get_contents($img));
+        $i  = imagecreatefromstring(file_get_contents($img));
         $ww = imagesx($i);
         if ($ww < $w) return;
         $hh = imagesy($i);
@@ -61,8 +69,8 @@ class Gd
         $ii = getimagesize($i);
         if ($ii[0] > $w) {
             $src = imagecreatefromjpeg($i);
-            $sw = $ii[0];
-            $sh = $ii[1];
+            $sw  = $ii[0];
+            $sh  = $ii[1];
 
             $h = $h == 0 ? $w / $sw * $sh : $h;
             //建立新的缩略图
@@ -86,8 +94,8 @@ class Gd
         $h = imagesy($i);
 
         $logo = imagecreatefromstring(file_get_contents(dirname(__FILE__) . '/logo.png'));
-        $lw = imagesx($logo);
-        $lh = imagesy($logo);
+        $lw   = imagesx($logo);
+        $lh   = imagesy($logo);
         switch ($pos) {
             case 1:
                 break;
@@ -130,5 +138,140 @@ class Gd
             $sss .= substr($str, $pos, 1);
         }
         return $sss;
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public static function posterWithContent($bg_url, $content): string
+    {
+        $client = new Client(['http_errors' => false]);
+        try {
+            $bg = $client->get($bg_url)->getBody()->getContents();
+            $bg = @imagecreatefromstring($bg);
+            if (!is_resource($bg)) {
+                throw new Exception();
+            }
+        } catch (Throwable $e) {
+            throw new Exception('没有从参数一获取到资源');
+        }
+        try {
+            $qr = @imagecreatefromstring($content);
+            if (!is_resource($qr)) {
+                throw new Exception();
+            }
+        } catch (Throwable $e) {
+            throw new Exception('没有从参数二获取到资源');
+        }
+        return self::poster($bg, $qr);
+    }
+
+    /**
+     * @throws Throwable
+     * composer require endroid/qrcode
+     */
+    public static function posterWithStr($bg_url, $str)
+    {
+        $client = new Client(['http_errors' => false]);
+        try {
+            $bg = $client->get($bg_url)->getBody()->getContents();
+            $bg = @imagecreatefromstring($bg);
+            if (!is_resource($bg)) {
+                throw new Exception();
+            }
+        } catch (Throwable $e) {
+            throw new Exception('没有从参数一获取到资源');
+        }
+        try {
+            $qr = @imagecreatefromstring((new PngWriter())->write(new QrCode($str))->getString());
+            if (!is_resource($qr)) {
+                throw new Exception();
+            }
+        } catch (Throwable $e) {
+            throw new Exception('没有从参数二获取到资源');
+        }
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public static function posterWithUrl($bg_url, $url, $x = '', $y = '', $scale = 1): string
+    {
+        $client = new Client(['http_errors' => false]);
+        try {
+            $bg = $client->get($bg_url)->getBody()->getContents();
+            $bg = @imagecreatefromstring($bg);
+            if (!is_resource($bg)) {
+                throw new Exception();
+            }
+        } catch (Throwable $e) {
+            throw new Exception('没有从参数一获取到资源');
+        }
+        try {
+            $qr = $client->get($url)->getBody()->getContents();
+            $qr = @imagecreatefromstring($qr);
+            if (!is_resource($qr)) {
+                throw new Exception();
+            }
+        } catch (Throwable $e) {
+            throw new Exception('没有从参数二获取到资源');
+        }
+        return self::poster($bg, $qr, $x, $y, $scale);
+    }
+
+    public static function poster($bg, $qr, $x = '', $y = '', $scale = 1): string
+    {
+        # 默认放正中间
+        if ($x === '' || $y === '') {
+            $x = imagesx($bg) / 2 - imagesx($qr) / 2;
+            $y = imagesy($bg) / 2 - imagesy($qr) / 2;
+        }
+        imagecopyresized(
+            $bg,
+            $qr,
+            $x,       # 嵌入图像左上角要放入背景图像的x坐标点
+            $y,       # 嵌入图像左上角要放入背景图像的y坐标点
+            0,                                         # 嵌入图像的宽度取值x坐标点
+            0,                                         # 嵌入图像的高度取值y坐标点
+            imagesx($qr) * $scale,                              # 嵌入图像在背景图像中要占用的宽度
+            imagesy($qr) * $scale,                              # 嵌入图像在背景图像中要占用的高度
+            imagesx($qr),                              # 从嵌入图像坐标点要取的宽度
+            imagesy($qr)                               # 从嵌入图像坐标点要取的高度
+        );
+        $r = File::generateFileName('poster', '.png');
+        imagepng($bg, $r);
+        imagedestroy($bg);
+        imagedestroy($qr);
+        return $r;
+    }
+
+    public static function poster_debug($bg, $qr, $x = 0, $y = 0, $scale = 1)
+    {
+        $client = new Client(['http_errors' => false]);
+        try {
+            $bg = Str::domain($bg);
+            $bg = $client->get($bg)->getBody()->getContents();
+            $bg = @imagecreatefromstring($bg);
+            if (!is_resource($bg)) {
+                throw new Exception();
+            }
+        } catch (Throwable $e) {
+            throw new Exception('没有从参数一获取到资源');
+        }
+        try {
+            $qr = Str::domain($qr);
+            $qr = $client->get($qr)->getBody()->getContents();
+            $qr = @imagecreatefromstring($qr);
+            if (!is_resource($qr)) {
+                throw new Exception();
+            }
+        } catch (Throwable $e) {
+            throw new Exception('没有从参数二获取到资源');
+        }
+        imagecopyresized($bg, $qr, $x, $y, 0, 0, imagesx($qr) * $scale, imagesy($qr) * $scale, imagesx($qr), imagesy($qr));
+        $response = new Response();
+        $response->header('content-type:image/png');
+        imagepng($bg);
+        throw new HttpResponseException($response);
     }
 }
