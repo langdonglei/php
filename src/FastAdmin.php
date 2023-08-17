@@ -2,6 +2,7 @@
 
 namespace langdonglei;
 
+use app\common\library\Auth;
 use think\Cache;
 use think\Config;
 use think\Db;
@@ -10,6 +11,62 @@ use Throwable;
 
 class FastAdmin
 {
+    const DIR_SRC        = __DIR__ . '/../addon/';
+    const DIR_PACKAGE    = __DIR__ . '/../../../runtime/zz/addon/';
+    const DIR_OUTPUT     = __DIR__ . '/../../../addons/';
+    const DIR_MOVE_ASSET = __DIR__ . '/../../../public/assets/addons/';
+
+    const ADDON_JS    = __DIR__ . '/../../../public/assets/js/addons.js';
+    const ADDON_EXTRA = __DIR__ . '/../../../application/extra/addons.php';
+
+    public static function auth(): array
+    {
+        $auth = Auth::instance();
+
+        $id = input('id/d');
+        if ($id) {
+            $auth->direct($id);
+            $r['id'] = $auth->getToken();
+        } else {
+            $r['id'] = '';
+        }
+
+        $username = input('username/s');
+        if ($username) {
+            $user = Db::table('fa_user')->where('username', $username)->find();
+            if ($user) {
+                $auth->direct($user['id']);
+                $r['username'] = $auth->getToken();
+            } else {
+                $r['username'] = '';
+            }
+        } else {
+            $r['username'] = '';
+        }
+
+        $mobile = input('mobile/s');
+        if ($mobile) {
+            $user = Db::table('fa_user')->where('mobile', $mobile)->find();
+            if ($user) {
+                $auth->direct($user['id']);
+                $r['mobile'] = $auth->getToken();
+            } else {
+                $r['mobile'] = '';
+            }
+        } else {
+            $r['mobile'] = '';
+        }
+
+        $token = input('token/s');
+        if ($token) {
+            $config     = Config::get('token');
+            $r['token'] = Db::table('fa_user')->field('id,username,mobile,nickname')->find(Db::table('fa_user_token')->where('token', hash_hmac($config['hashalgo'], $token, $config['key']))->value('user_id'));
+        } else {
+            $r['token'] = '';
+        }
+        return $r;
+    }
+
     public static function where($where, $from, $to): array
     {
         $where = (new ReflectionFunction($where))->getStaticVariables()['where'];
@@ -24,14 +81,6 @@ class FastAdmin
         }
         return $ret;
     }
-
-    const DIR_SRC        = __DIR__ . '/../addon/';
-    const DIR_PACKAGE    = __DIR__ . '/../../../runtime/zz/addon/';
-    const DIR_OUTPUT     = __DIR__ . '/../../../addons/';
-    const DIR_MOVE_ASSET = __DIR__ . '/../../../public/assets/addons/';
-
-    const ADDON_JS    = __DIR__ . '/../../../public/assets/js/addons.js';
-    const ADDON_EXTRA = __DIR__ . '/../../../application/extra/addons.php';
 
     public static function package($id)
     {
