@@ -149,7 +149,7 @@ class File
     /**
      * @throws Throwable
      */
-    public static function excel_import($target, $fields, $model = null)
+    public static function excel_import($target, $fields, $row_start = 2, $model = null)
     {
         $ext = pathinfo($target, PATHINFO_EXTENSION);
         if (!in_array($ext, ['csv', 'xls', 'xlsx'])) {
@@ -185,7 +185,7 @@ class File
             $sheet = $reader->load($target)->getSheet(0);
             $row   = $sheet->getHighestRow();
             $col   = count($fields);
-            for ($r = 2; $r <= $row; $r++) {
+            for ($r = $row_start; $r <= $row; $r++) {
                 $item = [];
                 for ($c = 1; $c <= $col; $c++) {
                     $item[] = $sheet->getCellByColumnAndRow($c, $r)->getValue() ?? '';
