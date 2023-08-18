@@ -149,7 +149,7 @@ class File
     /**
      * @throws Throwable
      */
-    public function excel_import($target, $fields, $model = null)
+    public static function excel_import($target, $fields, $model = null)
     {
         $ext = pathinfo($target, PATHINFO_EXTENSION);
         if (!in_array($ext, ['csv', 'xls', 'xlsx'])) {
@@ -202,7 +202,7 @@ class File
         }
     }
 
-    public function excel_output($array)
+    public static function excel_output($array)
     {
         header('Cache-Control: max-age=0');
         header('Content-Disposition: attachment;filename="excel.xlsx"');
