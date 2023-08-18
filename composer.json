@@ -10,7 +10,8 @@
     "guzzlehttp/guzzle": "^6",
     "ext-gd": "*",
     "endroid/qrcode": "^4.6",
-    "wechatpay/wechatpay": "^1.4"
+    "wechatpay/wechatpay": "^1.4",
+    "ext-mbstring": "*"
   },
   "config": {
     "preferred-install": "dist",
