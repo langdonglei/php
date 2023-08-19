@@ -149,14 +149,17 @@ class File
     /**
      * @throws Throwable
      */
-    public static function excel_import($target, $fields, $row_start = 2, $model = null)
+    public static function excel_import($absolute_path, $fields, $row_start = 2, $model = null)
     {
-        $ext = pathinfo($target, PATHINFO_EXTENSION);
+        if (!str_starts_with($absolute_path, '/')) {
+            throw new Exception('参数一必须是绝对路径');
+        }
+        $ext = pathinfo($absolute_path, PATHINFO_EXTENSION);
         if (!in_array($ext, ['csv', 'xls', 'xlsx'])) {
             throw new Exception('未知的数据格式');
         }
         if ($ext === 'csv') {
-            $file = fopen($target, 'r');
+            $file = fopen($absolute_path, 'r');
             $path = tempnam(sys_get_temp_dir(), 'import_csv');
             $fp   = fopen($path, "w");
             $n    = 0;
@@ -182,7 +185,7 @@ class File
         }
         $data = [];
         try {
-            $sheet = $reader->load($target)->getSheet(0);
+            $sheet = $reader->load($absolute_path)->getSheet(0);
             $row   = $sheet->getHighestRow();
             $col   = count($fields);
             for ($r = $row_start; $r <= $row; $r++) {
