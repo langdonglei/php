@@ -183,25 +183,21 @@ class File
         } else {
             $reader = new Xlsx();
         }
-        $data = [];
-        try {
-            $sheet = $reader->load($absolute_path)->getSheet(0);
-            $row   = $sheet->getHighestRow();
-            $col   = count($fields);
-            for ($r = $row_start; $r <= $row; $r++) {
-                $item = [];
-                for ($c = 1; $c <= $col; $c++) {
-                    $item[] = $sheet->getCellByColumnAndRow($c, $r)->getValue() ?? '';
-                }
-                $data[] = array_combine($fields, $item);
+        $data  = [];
+        $sheet = $reader->load($absolute_path)->getSheet(0);
+        $row   = $sheet->getHighestRow();
+        $col   = count($fields);
+        for ($r = $row_start; $r <= $row; $r++) {
+            $item = [];
+            for ($c = 1; $c <= $col; $c++) {
+                $item[] = $sheet->getCellByColumnAndRow($c, $r)->getValue() ?? '';
             }
-            if ($model) {
-                $model->saveAll($data);
-            } else {
-                return $data;
-            }
-        } catch (Throwable $e) {
-            throw new Exception('操作失败 请按照模板中的格式进行导入');
+            $data[] = array_combine($fields, $item);
+        }
+        if ($model) {
+            $model->saveAll($data);
+        } else {
+            return $data;
         }
     }
 
