@@ -84,30 +84,30 @@ class File
         }
     }
 
-    public static function zip($target, $out = '', $exclude = [])
-    {
-        self::exist($target);
-        $exclude = array_merge(['.git', '.DS_Store', 'Thumbs.db'], $exclude);
-        if (empty($out)) {
-            $out = $target . '.zip';
-        }
-        $zipArchive = new ZipArchive;
-        $zipArchive->open($out, ZipArchive::CREATE | ZipArchive::OVERWRITE);
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($target),
-            RecursiveIteratorIterator::LEAVES_ONLY
-        );
-        foreach ($iterator as $file) {
-            if (!$file->isDir()) {
-                $filePath     = $file->getRealPath();
-                $relativePath = str_replace(DIRECTORY_SEPARATOR, '/', substr($filePath, strlen($target)));
-                if (!in_array($file->getFilename(), $exclude)) {
-                    $zipArchive->addFile($filePath, $relativePath);
-                }
-            }
-        }
-        $zipArchive->close();
-    }
+//    public static function zip($target, $out = '', $exclude = [])
+//    {
+//        self::exist($target);
+//        $exclude = array_merge(['.git', '.DS_Store', 'Thumbs.db'], $exclude);
+//        if (empty($out)) {
+//            $out = $target . '.zip';
+//        }
+//        $zipArchive = new ZipArchive;
+//        $zipArchive->open($out, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+//        $iterator = new RecursiveIteratorIterator(
+//            new RecursiveDirectoryIterator($target),
+//            RecursiveIteratorIterator::LEAVES_ONLY
+//        );
+//        foreach ($iterator as $file) {
+//            if (!$file->isDir()) {
+//                $filePath     = $file->getRealPath();
+//                $relativePath = str_replace(DIRECTORY_SEPARATOR, '/', substr($filePath, strlen($target)));
+//                if (!in_array($file->getFilename(), $exclude)) {
+//                    $zipArchive->addFile($filePath, $relativePath);
+//                }
+//            }
+//        }
+//        $zipArchive->close();
+//    }
 
 //    public static function unzip($target, $out = '')
 //    {
