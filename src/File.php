@@ -109,19 +109,19 @@ class File
         $zipArchive->close();
     }
 
-    public static function unzip($target, $out = '')
-    {
-        self::exist($target);
-        if (empty($out)) {
-            $out = getcwd() . '/' . pathinfo($target)['filename'];
-        }
-        self::clear($out);
-
-        $zipFile = new ZipFile();
-        $zipFile->openFile($target);
-        $zipFile->extractTo($out);
-        $zipFile->close();
-    }
+//    public static function unzip($target, $out = '')
+//    {
+//        self::exist($target);
+//        if (empty($out)) {
+//            $out = getcwd() . '/' . pathinfo($target)['filename'];
+//        }
+//        self::clear($out);
+//
+//        $zipFile = new ZipFile();
+//        $zipFile->openFile($target);
+//        $zipFile->extractTo($out);
+//        $zipFile->close();
+//    }
 
     public static function touch($file, $content = '')
     {
