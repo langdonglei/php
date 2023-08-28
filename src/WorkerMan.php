@@ -25,7 +25,7 @@ class WorkerMan extends Command
 
     protected function execute(Input $input, Output $output)
     {
-        var_dump(class_exists($input->getArgument('handler')));
+        var_dump($input->getArgument('handler'),class_exists($input->getArgument('handler')));
         return;
         global $argv;
         $argv[1] = $input->getArgument('action');
