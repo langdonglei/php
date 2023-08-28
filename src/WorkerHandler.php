@@ -4,9 +4,9 @@ namespace langdonglei;
 
 interface WorkerHandler
 {
-    public function onWorkerStart();
+    public static function onWorkerStart();
 
-    public function onMessage();
+    public static function onMessage();
 
     /**
      *
