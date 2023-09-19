@@ -188,4 +188,9 @@ EOF
             FileS::write_array(self::ADDON_EXTRA, $config);
         }
     }
+
+    public function encrypt($password, $salt): string
+    {
+        return md5(md5($password) . $salt);
+    }
 }
