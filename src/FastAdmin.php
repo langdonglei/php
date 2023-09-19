@@ -189,7 +189,7 @@ EOF
         }
     }
 
-    public function encrypt($password, $salt): string
+    public static function encrypt($password, $salt): string
     {
         return md5(md5($password) . $salt);
     }
