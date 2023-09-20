@@ -21,7 +21,7 @@ class Str
         return $domain . '/' . ltrim($str, '/');
     }
 
-    public static function env($name, $prefix = 'PHP_'): bool|array|string
+    public static function env($name, $prefix = 'PHP_')
     {
         $r = getenv($prefix . strtoupper(str_replace('.', '_', $name)));
         if (false !== $r) {
