@@ -2,6 +2,8 @@
 
 namespace langdonglei;
 
+use Exception;
+
 class Str
 {
     public static function domain($str, $must_self = false)
@@ -17,5 +19,19 @@ class Str
             $domain = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'];
         }
         return $domain . '/' . ltrim($str, '/');
+    }
+
+    public static function env($name, $prefix = 'PHP_'): bool|array|string
+    {
+        $r = getenv($prefix . strtoupper(str_replace('.', '_', $name)));
+        if (false !== $r) {
+            if ('false' === $r) {
+                $r = false;
+            } else if ('true' === $r) {
+                $r = true;
+            }
+            return $r;
+        }
+        throw new Exception('未配置环境变量 ' . $name);
     }
 }
