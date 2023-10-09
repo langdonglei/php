@@ -22,47 +22,36 @@ class FastAdmin
     public static function auth(): array
     {
         $auth = Auth::instance();
-
-        $id = input('id/d');
-        if ($id) {
-            $auth->direct($id);
-            $r['id'] = $auth->getToken();
-        } else {
-            $r['id'] = '';
+        if ($user_id = input('user_id')) {
+            $auth->direct($user_id);
+            $r['user_id'] = $auth->getToken();
         }
-
-        $username = input('username/s');
-        if ($username) {
-            $user = Db::table('fa_user')->where('username', $username)->find();
-            if ($user) {
+        if ($username = input('username')) {
+            if ($user = Db::table('fa_user')->where('username', $username)->find()) {
                 $auth->direct($user['id']);
                 $r['username'] = $auth->getToken();
             } else {
-                $r['username'] = '';
+                $r['username'] = '用户不存在';
             }
-        } else {
-            $r['username'] = '';
         }
-
-        $mobile = input('mobile/s');
-        if ($mobile) {
-            $user = Db::table('fa_user')->where('mobile', $mobile)->find();
-            if ($user) {
+        if ($mobile = input('mobile/s')) {
+            if ($user = Db::table('fa_user')->where('mobile', $mobile)->find()) {
                 $auth->direct($user['id']);
                 $r['mobile'] = $auth->getToken();
             } else {
-                $r['mobile'] = '';
+                $r['mobile'] = '用户不存在';
             }
-        } else {
-            $r['mobile'] = '';
         }
-
-        $token = input('token/s');
-        if ($token) {
-            $config     = Config::get('token');
+        $config = Config::get('token');
+        if ($token = input('token')) {
             $r['token'] = Db::table('fa_user')->field('id,username,mobile,nickname')->find(Db::table('fa_user_token')->where('token', hash_hmac($config['hashalgo'], $token, $config['key']))->value('user_id'));
         } else {
             $r['token'] = '';
+        }
+        if ($current = request()->header('token')) {
+            $r['current'] = Db::table('fa_user')->field('id,username,mobile,nickname')->find(Db::table('fa_user_token')->where('token', hash_hmac($config['hashalgo'], $current, $config['key']))->value('user_id'));
+        } else {
+            $r['current'] = '';
         }
         return $r;
     }
@@ -198,5 +187,10 @@ EOF
         if (!$config['autoload']) {
             FileS::write_array(self::ADDON_EXTRA, $config);
         }
+    }
+
+    public static function encrypt($password, $salt): string
+    {
+        return md5(md5($password) . $salt);
     }
 }
