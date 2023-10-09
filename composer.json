@@ -24,7 +24,10 @@
   "autoload": {
     "psr-4": {
       "langdonglei\\": "src"
-    }
+    },
+    "files": [
+      "src/boot.php"
+    ]
   },
   "bin": [
   ]
