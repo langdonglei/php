@@ -1,8 +1,8 @@
 <?php
 
-namespace langdonglei;
+namespace websocket;
 
-interface WorkerHandler
+interface EventsInterface
 {
     public static function onWorkerStart();
 

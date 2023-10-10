@@ -1,6 +1,6 @@
 <?php
 
-namespace langdonglei;
+namespace websocket;
 
 use Exception;
 use GatewayWorker\BusinessWorker;
@@ -15,7 +15,7 @@ use think\console\Output;
 use Throwable;
 use Workerman\Worker;
 
-class WorkerMan extends Command
+class ServerByThink extends Command
 {
     protected function configure()
     {
