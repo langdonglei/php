@@ -6,7 +6,6 @@
     <link rel="stylesheet" href="/css/bootstrap.css">
     <link href="/css/style.css" rel="stylesheet">
 
-
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="/js/jquery-sinaEmotion-2.1.0.min.js"></script>
     <link href="/css/jquery-sinaEmotion-2.1.0.min.css" rel="stylesheet">
@@ -23,13 +22,16 @@
 
         function connect() {
             ws = new WebSocket("ws://" + document.domain + ":7272");
+            ws.onerror = function () {
+                alert('服务器连接失败')
+            }
             ws.onclose = function () {
                 connect()
             }
-            ws.onopen = function onopen() {
+            ws.onopen = function () {
                 if (!name) {
                     name = prompt('输入你的名字：', '');
-                    if (!name || name == 'null') {
+                    if (!name || name === 'null') {
                         name = '游客';
                     }
                 }
