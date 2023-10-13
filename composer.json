@@ -27,7 +27,6 @@
       "langdonglei\\": "src"
     },
     "files": [
-      "src/boot.php"
     ]
   },
   "bin": [
