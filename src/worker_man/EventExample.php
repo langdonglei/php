@@ -1,4 +1,6 @@
 <?php
+namespace langdonglei\worker_man;
+
 /**
  * 用于检测业务代码死循环或者长时间阻塞等问题
  * 如果发现业务卡死，可以将下面declare打开（去掉//注释），并执行php start.php reload
@@ -8,9 +10,38 @@
 //declare(ticks=1);
 
 use GatewayWorker\Lib\Gateway;
+use langdonglei\worker_man\websocket\GatewayWorker;
+use langdonglei\worker_man\websocket\Workerman;
 
-class Events
+class EventExample
 {
+    public static function onWorkerStart()
+    {
+        Workerman\Lib\Timer::add(1, function () {
+            echo 1;
+            GatewayWorker\Lib\Gateway::sendToAll(json_encode([
+                'type' => 'v',
+                'data' => 111
+            ]));
+            /**
+             * !function connect() {
+             * const ws = new WebSocket("ws://" + document.domain + ":4110")
+             * ws.onclose = function () {
+             *      connect()
+             * }
+             * ws.onmessage = function (e) {
+             *      const {type, data} = JSON.parse(e.data)
+             *      switch (type) {
+             *          case 'ping':
+             *              socket.send(JSON.stringify({type: 'pong'}))
+             *              break;
+             *          }
+             *      }
+             * }()
+             */
+        });
+    }
+
     public static function onClose($client_id)
     {
         // debug
@@ -19,10 +50,10 @@ class Events
         // 从房间的客户端列表中删除
         if (isset($_SESSION['room_id'])) {
             Gateway::sendToGroup($_SESSION['room_id'], json_encode([
-                'type'             => 'logout',
-                'from_client_id'   => $client_id,
+                'type' => 'logout',
+                'from_client_id' => $client_id,
                 'from_client_name' => $_SESSION['client_name'],
-                'time'             => date('Y-m-d H:i:s')
+                'time' => date('Y-m-d H:i:s')
             ]));
         }
     }
@@ -50,9 +81,9 @@ class Events
                 }
 
                 // 把房间号昵称放到session中
-                $room_id                 = $message_data['room_id'];
-                $client_name             = htmlspecialchars($message_data['client_name']);
-                $_SESSION['room_id']     = $room_id;
+                $room_id = $message_data['room_id'];
+                $client_name = htmlspecialchars($message_data['client_name']);
+                $_SESSION['room_id'] = $room_id;
                 $_SESSION['client_name'] = $client_name;
 
                 // 获取房间内所有用户列表 
@@ -78,18 +109,18 @@ class Events
                 if (!isset($_SESSION['room_id'])) {
                     throw new \Exception("\$_SESSION['room_id'] not set. client_ip:{$_SERVER['REMOTE_ADDR']}");
                 }
-                $room_id     = $_SESSION['room_id'];
+                $room_id = $_SESSION['room_id'];
                 $client_name = $_SESSION['client_name'];
 
                 // 私聊
                 if ($message_data['to_client_id'] != 'all') {
                     $new_message = array(
-                        'type'             => 'say',
-                        'from_client_id'   => $client_id,
+                        'type' => 'say',
+                        'from_client_id' => $client_id,
                         'from_client_name' => $client_name,
-                        'to_client_id'     => $message_data['to_client_id'],
-                        'content'          => "<b>对你说: </b>" . nl2br(htmlspecialchars($message_data['content'])),
-                        'time'             => date('Y-m-d H:i:s'),
+                        'to_client_id' => $message_data['to_client_id'],
+                        'content' => "<b>对你说: </b>" . nl2br(htmlspecialchars($message_data['content'])),
+                        'time' => date('Y-m-d H:i:s'),
                     );
                     Gateway::sendToClient($message_data['to_client_id'], json_encode($new_message));
                     $new_message['content'] = "<b>你对" . htmlspecialchars($message_data['to_client_name']) . "说: </b>" . nl2br(htmlspecialchars($message_data['content']));
@@ -97,12 +128,12 @@ class Events
                 }
 
                 $new_message = array(
-                    'type'             => 'say',
-                    'from_client_id'   => $client_id,
+                    'type' => 'say',
+                    'from_client_id' => $client_id,
                     'from_client_name' => $client_name,
-                    'to_client_id'     => 'all',
-                    'content'          => nl2br(htmlspecialchars($message_data['content'])),
-                    'time'             => date('Y-m-d H:i:s'),
+                    'to_client_id' => 'all',
+                    'content' => nl2br(htmlspecialchars($message_data['content'])),
+                    'time' => date('Y-m-d H:i:s'),
                 );
                 return Gateway::sendToGroup($room_id, json_encode($new_message));
         }
