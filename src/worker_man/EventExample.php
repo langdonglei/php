@@ -1,4 +1,5 @@
 <?php
+
 namespace langdonglei\worker_man;
 
 /**
@@ -12,6 +13,7 @@ namespace langdonglei\worker_man;
 use GatewayWorker\Lib\Gateway;
 use langdonglei\worker_man\websocket\GatewayWorker;
 use langdonglei\worker_man\websocket\Workerman;
+use Workerman\Lib\Timer;
 
 class EventExample
 {
@@ -19,26 +21,32 @@ class EventExample
     {
         Workerman\Lib\Timer::add(1, function () {
             echo 1;
-            GatewayWorker\Lib\Gateway::sendToAll(json_encode([
-                'type' => 'v',
-                'data' => 111
-            ]));
-            /**
-             * !function connect() {
-             * const ws = new WebSocket("ws://" + document.domain + ":4110")
-             * ws.onclose = function () {
-             *      connect()
-             * }
-             * ws.onmessage = function (e) {
-             *      const {type, data} = JSON.parse(e.data)
-             *      switch (type) {
-             *          case 'ping':
-             *              socket.send(JSON.stringify({type: 'pong'}))
-             *              break;
-             *          }
-             *      }
-             * }()
-             */
+            Timer::add(5, function () {
+                Gateway::sendToAll(json_encode([
+                    'type'    => 'vv',
+                    'message' => [
+                        'a' => 1,
+                        'b' => 'c'
+                    ]
+                ]));
+            });
+            // !function connect() {
+            //     const ws = new WebSocket("ws://" + document.domain + ":4001")
+            //     ws.onclose = function () {
+            //         connect()
+            //     }
+            //     ws.onmessage = function (e) {
+            //         const {type, message} = JSON.parse(e.data)
+            //         switch (type) {
+            //             case 'ping':
+            //                 ws.send(JSON.stringify({type: 'pong',message:''}))
+            //                 break;
+            //             case 'vv':
+            //                 console.log(message);
+            //                 ws.send(JSON.stringify({type: type,message:message}))
+            //         }
+            //     }
+            // }()
         });
     }
 
