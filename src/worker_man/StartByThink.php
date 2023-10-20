@@ -6,11 +6,15 @@ use Exception;
 use GatewayWorker\BusinessWorker;
 use GatewayWorker\Gateway;
 use GatewayWorker\Register;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use ReflectionClass;
 use think\console\Command;
 use think\console\Input;
 use think\console\input\Argument;
 use think\console\input\Option;
 use think\console\Output;
+use Workerman\Timer;
 use Workerman\Worker;
 
 class StartByThink extends Command
@@ -36,15 +40,41 @@ class StartByThink extends Command
         global $argv;
         $argv[1] = $input->getArgument('action');
         $argv[2] = $input->getOption('demon') ? '-d' : '';
+
         new Register('text://127.0.0.1:' . $text);
-        $worker = new BusinessWorker();
-        $worker->registerAddress = '127.0.0.1:' . $text;
-        $worker->eventHandler = $handler;
-        $gateway = new Gateway('websocket://0.0.0.0:' . $port);
-        $gateway->registerAddress = '127.0.0.1:' . $text;
-        $gateway->pingInterval = 1;
+
+        $business                  = new BusinessWorker();
+        $business->name            = 'Business';
+        $business->registerAddress = '127.0.0.1:' . $text;
+        $business->eventHandler    = $handler;
+
+        $gateway                       = new Gateway('websocket://0.0.0.0:' . $port);
+        $gateway->name                 = 'Gateway';
+        $gateway->registerAddress      = '127.0.0.1:' . $text;
+        $gateway->pingInterval         = 1;
         $gateway->pingNotResponseLimit = 11;
-        $gateway->pingData = json_encode(['type' => 'ping']);
+        $gateway->pingData             = json_encode(['type' => 'ping']);
+
+        if (!Worker::$daemonize) {
+            $monitor                = new Worker();
+            $monitor->name          = 'Monitor';
+            $monitor->reloadable    = false;
+            $monitor->onWorkerStart = function () use ($handler) {
+                $event_file = (new ReflectionClass($handler))->getFileName();
+                $dir        = substr($event_file, 0, strrpos($event_file, '/'));
+                $last_mtime = time();
+                Timer::add(1, function () use ($dir, &$last_mtime) {
+                    foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir)) as $file) {
+                        if (pathinfo($file, PATHINFO_EXTENSION) == 'php' && $last_mtime < $file->getMTime()) {
+                            posix_kill(posix_getppid(), SIGUSR1);
+                            $last_mtime = $file->getMTime();
+                            break;
+                        }
+                    }
+                });
+            };
+        }
+
         Worker::runAll();
     }
 }
