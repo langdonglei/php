@@ -55,6 +55,7 @@ class StartByThink extends Command
         $gateway->pingNotResponseLimit = 11;
         $gateway->pingData             = json_encode(['type' => 'ping']);
 
+        # todo 热加载未生效
         if (!Worker::$daemonize) {
             $monitor                = new Worker();
             $monitor->name          = 'Monitor';
