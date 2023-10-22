@@ -25,8 +25,8 @@ class StartByThink extends Command
             ->addArgument('action', Argument::REQUIRED)
             ->addArgument('handler', Argument::REQUIRED)
             ->addOption('demon', '-d', Option::VALUE_NONE)
-            ->addOption('port', '-p', Option::VALUE_OPTIONAL, '', 4001)
-            ->addOption('text', '-t', Option::VALUE_OPTIONAL, '', 4000);
+            ->addOption('gateway_port', '-p', Option::VALUE_OPTIONAL, '', \think\Env::get('worker_man_gateway_port', 4001))
+            ->addOption('register_port', '-t', Option::VALUE_OPTIONAL, '', \think\Env::get('worker_man_register_port', 4000));
     }
 
     protected function execute(Input $input, Output $output)
@@ -35,22 +35,22 @@ class StartByThink extends Command
         if (!class_exists($handler)) {
             throw new Exception('handler ' . $handler . '不存在');
         }
-        $port = $input->getOption('port');
-        $text = $input->getOption('text');
+        $gateway_port  = $input->getOption('gateway_port');
+        $register_port = $input->getOption('register_port');
         global $argv;
         $argv[1] = $input->getArgument('action');
         $argv[2] = $input->getOption('demon') ? '-d' : '';
 
-        new Register('text://127.0.0.1:' . $text);
+        new Register('text://127.0.0.1:' . $register_port);
 
         $business                  = new BusinessWorker();
         $business->name            = 'Business';
-        $business->registerAddress = '127.0.0.1:' . $text;
+        $business->registerAddress = '127.0.0.1:' . $register_port;
         $business->eventHandler    = $handler;
 
-        $gateway                       = new Gateway('websocket://0.0.0.0:' . $port);
+        $gateway                       = new Gateway('websocket://0.0.0.0:' . $gateway_port);
         $gateway->name                 = 'Gateway';
-        $gateway->registerAddress      = '127.0.0.1:' . $text;
+        $gateway->registerAddress      = '127.0.0.1:' . $register_port;
         $gateway->pingInterval         = 1;
         $gateway->pingNotResponseLimit = 11;
         $gateway->pingData             = json_encode(['type' => 'ping']);
