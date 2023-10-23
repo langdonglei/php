@@ -17,12 +17,12 @@ class ThinkPhp
         }
     }
 
-    public static function config($name)
+    public static function config($name, $exception = true)
     {
         $r = Config($name);
-        if ($r) {
-            return $r;
+        if (!$r && $exception) {
+            throw new Exception("config not found $name");
         }
-        throw new Exception("config not found $name");
+        return $r;
     }
 }
