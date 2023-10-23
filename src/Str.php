@@ -21,17 +21,17 @@ class Str
         return $domain . '/' . ltrim($str, '/');
     }
 
-    public static function env($name, $prefix = 'PHP_')
+    public static function env($name, $exception = true, $prefix = 'PHP_')
     {
         $r = getenv($prefix . strtoupper(str_replace('.', '_', $name)));
-        if (false !== $r) {
-            if ('false' === $r) {
-                $r = false;
-            } else if ('true' === $r) {
-                $r = true;
-            }
-            return $r;
+        if ($r === false && $exception) {
+            throw new Exception("env not found $prefix$name");
         }
-        throw new Exception('未配置环境变量 ' . $name);
+        if ('false' === $r) {
+            $r = false;
+        } else if ('true' === $r) {
+            $r = true;
+        }
+        return $r;
     }
 }
