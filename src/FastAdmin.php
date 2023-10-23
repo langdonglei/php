@@ -194,7 +194,7 @@ EOF
         return md5(md5($password) . $salt);
     }
 
-    public static function get_user_id_from_token($token)
+    public static function get_user_id_by_token($token)
     {
         $token_decrypted = hash_hmac(Config::get('token.hashalgo'), $token, Config::get('token.key'));
         return Db::table('fa_user_token')->where([
