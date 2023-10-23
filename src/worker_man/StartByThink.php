@@ -6,6 +6,7 @@ use Exception;
 use GatewayWorker\BusinessWorker;
 use GatewayWorker\Gateway;
 use GatewayWorker\Register;
+use langdonglei\ThinkPhp;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use ReflectionClass;
@@ -23,20 +24,17 @@ class StartByThink extends Command
     {
         $this->setName('worker')
             ->addArgument('action', Argument::REQUIRED)
-            ->addArgument('handler', Argument::REQUIRED)
-            ->addOption('demon', '-d', Option::VALUE_NONE)
-            ->addOption('gateway_port', '-p', Option::VALUE_OPTIONAL, '', \think\Env::get('worker_man_gateway_port', 4001))
-            ->addOption('register_port', '-t', Option::VALUE_OPTIONAL, '', \think\Env::get('worker_man_register_port', 4000));
+            ->addOption('demon', '-d', Option::VALUE_NONE);
     }
 
     protected function execute(Input $input, Output $output)
     {
-        $handler = $input->getArgument('handler');
+        $register_port = ThinkPhp::config('worker_man.register_port');
+        $gateway_port  = ThinkPhp::config('worker_man.gateway_port');
+        $handler       = ThinkPhp::config('worker_man.handler');
         if (!class_exists($handler)) {
             throw new Exception('handler ' . $handler . '不存在');
         }
-        $gateway_port  = $input->getOption('gateway_port');
-        $register_port = $input->getOption('register_port');
         global $argv;
         $argv[1] = $input->getArgument('action');
         $argv[2] = $input->getOption('demon') ? '-d' : '';
@@ -55,7 +53,6 @@ class StartByThink extends Command
         $gateway->pingNotResponseLimit = 11;
         $gateway->pingData             = json_encode(['type' => 'ping']);
 
-        # todo 热加载未生效
         if (!Worker::$daemonize) {
             $monitor                = new Worker();
             $monitor->name          = 'Monitor';
