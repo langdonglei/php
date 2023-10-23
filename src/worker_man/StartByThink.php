@@ -6,7 +6,6 @@ use Exception;
 use GatewayWorker\BusinessWorker;
 use GatewayWorker\Gateway;
 use GatewayWorker\Register;
-use langdonglei\ThinkPhp;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use ReflectionClass;
@@ -29,12 +28,13 @@ class StartByThink extends Command
 
     protected function execute(Input $input, Output $output)
     {
-        $register_port = ThinkPhp::config('worker_man.register_port');
-        $gateway_port  = ThinkPhp::config('worker_man.gateway_port');
-        $handler       = ThinkPhp::config('worker_man.handler');
+        $register_port = 4000;
+        $gateway_port  = 4001;
+        $handler       = \vv\Worker::class;
         if (!class_exists($handler)) {
             throw new Exception('handler ' . $handler . '不存在');
         }
+
         global $argv;
         $argv[1] = $input->getArgument('action');
         $argv[2] = $input->getOption('demon') ? '-d' : '';
