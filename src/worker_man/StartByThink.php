@@ -49,8 +49,8 @@ class StartByThink extends Command
         $gateway                       = new Gateway('websocket://0.0.0.0:' . $gateway_port);
         $gateway->name                 = 'Gateway';
         $gateway->registerAddress      = '127.0.0.1:' . $register_port;
-        $gateway->pingInterval         = 1;
-        $gateway->pingNotResponseLimit = 11;
+        $gateway->pingInterval         = 11;
+        $gateway->pingNotResponseLimit = 5;
         $gateway->pingData             = json_encode(['type' => 'ping']);
 
         if (!Worker::$daemonize) {
