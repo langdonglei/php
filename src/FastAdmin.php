@@ -205,8 +205,7 @@ EOF
 
     public static function get_user_by_token($token)
     {
-        $token_decrypted = hash_hmac(Config::get('token.hashalgo'), $token, Config::get('token.key'));
-        $user_id         = self::get_user_id_by_token($token_decrypted);
+        $user_id = self::get_user_id_by_token($token);
         return Db::table('fa_user')->where('user_id', $user_id)->find();
     }
 }
