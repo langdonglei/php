@@ -6,6 +6,19 @@ use Exception;
 
 class Str
 {
+    public static function echo($content, $name = '', $pad = 44)
+    {
+        $r        = date('y-m-d H:i:s');
+        $function = debug_backtrace()[1]['function'] ?? '';
+        if ($function) {
+            $r = $r . ' ' . $function;
+        }
+        if ($name) {
+            $r = $r . ' ' . $name;
+        }
+        echo str_pad($r, $pad) . ' => ' . $content . PHP_EOL;
+    }
+
     public static function domain($str, $must_self = false)
     {
         if (!$str || str_starts_with($str, 'http') || str_starts_with($str, 'data:image')) {
