@@ -206,6 +206,6 @@ EOF
     public static function get_user_by_token($token)
     {
         $user_id = self::get_user_id_by_token($token);
-        return Db::table('fa_user')->where('user_id', $user_id)->find();
+        return Db::table('fa_user')->where('id', $user_id)->find();
     }
 }
