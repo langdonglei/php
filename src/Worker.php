@@ -23,7 +23,7 @@ class Worker
 
     public static function exception($error, $arr)
     {
-        $r = json_encode(['error' => $error] + $arr);
+        $r = json_encode(['error' => $error] + $arr, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         throw new Exception($r);
     }
 }
