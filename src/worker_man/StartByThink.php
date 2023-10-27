@@ -50,7 +50,7 @@ class StartByThink extends Command
         $gateway->name                 = 'Gateway';
         $gateway->registerAddress      = '127.0.0.1:' . $register_port;
         $gateway->pingInterval         = 11;
-        $gateway->pingNotResponseLimit = 5;
+        $gateway->pingNotResponseLimit = 4;
         $gateway->pingData             = json_encode(['type' => 'ping']);
 
         if (!Worker::$daemonize) {
