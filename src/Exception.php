@@ -4,13 +4,11 @@ namespace langdonglei;
 
 class Exception extends \Exception
 {
-    const MESSAGE = '';
-
     public function __construct()
     {
-        preg_match('/(?<code>\d+)$/', static::class, $matches);
+        preg_match('/(?<code>\d+)(?<name>\w)$/', static::class, $matches);
+        $message = $matches['name'];
         $code    = $matches['code'];
-        $message = static::MESSAGE;
         parent::__construct($message, $code);
     }
 }
