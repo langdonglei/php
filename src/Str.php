@@ -6,7 +6,7 @@ use Exception;
 
 class Str
 {
-    public static function echo($content, $name = '', $pad = 44)
+    public static function echo($content, $name = '', $pad = 27)
     {
         $r        = date('y-m-d H:i:s');
         $function = debug_backtrace()[1]['function'] ?? '';
