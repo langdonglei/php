@@ -6,6 +6,19 @@ use Exception;
 
 class Str
 {
+    public static function echo($content, $name = '', $pad = 27)
+    {
+        $r        = date('y-m-d H:i:s');
+        $function = debug_backtrace()[1]['function'] ?? '';
+        if ($function) {
+            $r = $r . ' ' . $function;
+        }
+        if ($name) {
+            $r = $r . ' ' . $name;
+        }
+        echo str_pad($r, $pad) . ' => ' . $content . PHP_EOL;
+    }
+
     public static function domain($str, $must_self = false)
     {
         if (!$str || str_starts_with($str, 'http') || str_starts_with($str, 'data:image')) {
@@ -21,17 +34,17 @@ class Str
         return $domain . '/' . ltrim($str, '/');
     }
 
-    public static function env($name, $prefix = 'PHP_')
+    public static function env($name, $exception = true, $prefix = 'PHP_')
     {
         $r = getenv($prefix . strtoupper(str_replace('.', '_', $name)));
-        if (false !== $r) {
-            if ('false' === $r) {
-                $r = false;
-            } else if ('true' === $r) {
-                $r = true;
-            }
-            return $r;
+        if ($r === false && $exception) {
+            throw new Exception("env not found $prefix$name");
         }
-        throw new Exception('未配置环境变量 ' . $name);
+        if ('false' === $r) {
+            $r = false;
+        } else if ('true' === $r) {
+            $r = true;
+        }
+        return $r;
     }
 }
