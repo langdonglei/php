@@ -6,15 +6,15 @@ use Exception;
 
 class Str
 {
-    public static function echo($content, $name = '', $pad = 27)
+    public static function echo($content, $tag = '', $pad = 27)
     {
         $r        = date('y-m-d H:i:s');
         $function = debug_backtrace()[1]['function'] ?? '';
         if ($function) {
             $r = $r . ' ' . $function;
         }
-        if ($name) {
-            $r = $r . ' ' . $name;
+        if ($tag) {
+            $r = $r . ' ' . $tag;
         }
         if (is_array($content)) {
             $content = json_encode($content, JSON_UNESCAPED_UNICODE);
