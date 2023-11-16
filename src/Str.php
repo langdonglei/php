@@ -16,6 +16,9 @@ class Str
         if ($name) {
             $r = $r . ' ' . $name;
         }
+        if (is_array($content)) {
+            $content = json_encode($content, JSON_UNESCAPED_UNICODE);
+        }
         echo str_pad($r, $pad) . ' => ' . $content . PHP_EOL;
     }
 
