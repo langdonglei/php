@@ -19,7 +19,7 @@ class Str
         if (is_array($content)) {
             $content = json_encode($content, JSON_UNESCAPED_UNICODE);
         }
-        echo '(' . str_pad($title, $pad) . ') => ' . $content . PHP_EOL;
+        echo str_pad($title, $pad) . ' => ' . $content . PHP_EOL;
     }
 
     public static function domain($str, $must_self = false)
