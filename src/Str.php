@@ -6,17 +6,20 @@ use Exception;
 
 class Str
 {
-    public static function echo($content, $name = '', $pad = 27)
+    public static function echo($content, $tag = '', $pad = 44)
     {
-        $r        = date('y-m-d H:i:s');
+        $title    = date('y-m-d H:i:s');
         $function = debug_backtrace()[1]['function'] ?? '';
         if ($function) {
-            $r = $r . ' ' . $function;
+            $title = $title . ' ' . $function;
         }
-        if ($name) {
-            $r = $r . ' ' . $name;
+        if ($tag) {
+            $title = $title . ' ' . $tag;
         }
-        echo str_pad($r, $pad) . ' => ' . $content . PHP_EOL;
+        if (is_array($content)) {
+            $content = json_encode($content, JSON_UNESCAPED_UNICODE);
+        }
+        echo str_pad($title, $pad) . ' => ' . $content . PHP_EOL;
     }
 
     public static function domain($str, $must_self = false)
