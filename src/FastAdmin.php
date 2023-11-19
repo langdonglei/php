@@ -208,4 +208,31 @@ EOF
         $user_id = self::get_user_id_by_token($token);
         return Db::table('fa_user')->where('id', $user_id)->find();
     }
+
+    public static function who()
+    {
+        $token = request()->header('token');
+        if (!$token) {
+            throw new Exception('头部缺少token');
+        }
+
+        $config          = Config::get('token');
+        $token_encrypted = hash_hmac($config['hashalgo'], $token, $config['key']);
+        $user_id         = Db::table('fa_user_token')->where([
+            'token'      => $token_encrypted,
+            'expiretime' => ['>', time()]
+        ])->value('user_id');
+        if (!$user_id) {
+            throw new Exception('无效的token');
+        }
+
+        return Db::table('fa_user')->where([
+            'id' => $user_id
+        ])->field([
+            'id',
+            'username',
+            'mobile',
+            'nickname'
+        ])->findOrFail();
+    }
 }
