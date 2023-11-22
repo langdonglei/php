@@ -20,13 +20,12 @@ class FastAdmin
     const ADDON_JS    = __DIR__ . '/../../../public/assets/js/addons.js';
     const ADDON_EXTRA = __DIR__ . '/../../../application/extra/addons.php';
 
-    public static function generate_token($user_id, $expire_at = 0)
+    public static function generate_token($user_id, $expire = 0)
     {
         $auth = Auth::instance();
+        $auth->keeptime($expire);
         $auth->direct($user_id);
-        $token = $auth->getToken();
-        Token::set($token, $user_id);
-        return $token;
+        return $auth->getToken();
     }
 
     public static function auth(): array
