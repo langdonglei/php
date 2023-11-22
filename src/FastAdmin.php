@@ -194,19 +194,28 @@ EOF
         return md5(md5($password) . $salt);
     }
 
+    public static function encrypt_token($token)
+    {
+        $config = Config::get('token');
+        $algo   = $config['hashalgo'];
+        $key    = $config['key'];
+        return hash_hmac($algo, $token, $key);
+    }
+
     public static function get_user_id_by_token($token)
     {
-        $token_decrypted = hash_hmac(Config::get('token.hashalgo'), $token, Config::get('token.key'));
-        return Db::table('fa_user_token')->where([
-            'expiretime' => ['>', time()],
-            'token'      => $token_decrypted
-        ])->value('user_id');
+        return Db::table('fa_user_token')
+            ->where('token', FastAdmin::encrypt_token($token))
+            ->where(function ($query) {
+                $query->whereOr('expiretime', 0)
+                    ->whereOr('expiretime', null)
+                    ->whereOr('expiretime', '>', time());
+            })->value('user_id');
     }
 
     public static function get_user_by_token($token)
     {
-        $user_id = self::get_user_id_by_token($token);
-        return Db::table('fa_user')->where('id', $user_id)->find();
+        return Db::table('fa_user')->where('id', FastAdmin::get_user_id_by_token($token))->find();
     }
 
     public static function who()
