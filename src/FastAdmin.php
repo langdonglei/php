@@ -28,7 +28,10 @@ class FastAdmin
         Db::table('fa_user_token')->where('token', $token_encrypted)->update([
             'expiretime' => 0
         ]);
-        return $token;
+        return [
+            'token'=>$token,
+            'token_encrypted'=>$token_encrypted
+        ];
     }
 
     public static function auth(): array
