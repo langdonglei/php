@@ -19,6 +19,18 @@ class FastAdmin
     const ADDON_JS    = __DIR__ . '/../../../public/assets/js/addons.js';
     const ADDON_EXTRA = __DIR__ . '/../../../application/extra/addons.php';
 
+    public static function generate_token($user_id, $expire_at = 0)
+    {
+        $auth = Auth::instance();
+        $auth->direct($user_id);
+        $token           = $auth->getToken();
+        $token_encrypted = FastAdmin::encrypt_token($token);
+        Db::table('fa_user_token')->where('token', $token_encrypted)->update([
+            'expiretime' => 0
+        ]);
+        return $token;
+    }
+
     public static function auth(): array
     {
         $auth = Auth::instance();
