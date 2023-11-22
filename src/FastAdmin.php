@@ -23,15 +23,9 @@ class FastAdmin
     {
         $auth = Auth::instance();
         $auth->direct($user_id);
-        $token           = $auth->getToken();
-        $token_encrypted = FastAdmin::encrypt_token($token);
-        Db::table('fa_user_token')->where('token', $token_encrypted)->update([
-            'expiretime' => 0
-        ]);
-        return [
-            'token'=>$token,
-            'token_encrypted'=>$token_encrypted
-        ];
+        $token = $auth->getToken();
+        app\common\library\Token::set($token, $user_id);
+        return $token;
     }
 
     public static function auth(): array
