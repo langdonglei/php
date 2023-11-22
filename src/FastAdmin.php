@@ -3,6 +3,7 @@
 namespace langdonglei;
 
 use app\common\library\Auth;
+use app\common\library\Token;
 use think\Cache;
 use think\Config;
 use think\Db;
@@ -24,7 +25,7 @@ class FastAdmin
         $auth = Auth::instance();
         $auth->direct($user_id);
         $token = $auth->getToken();
-        app\common\library\Token::set($token, $user_id);
+        Token::set($token, $user_id);
         return $token;
     }
 
