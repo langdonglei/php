@@ -25,8 +25,12 @@ class ThinkPHP
             ], 'json'));
         }
         $r = [];
-        foreach (array_keys($rule) as $key) {
-            $r[$key] = Request::instance()->param($key);
+        foreach ($rule as $k => $v) {
+            if (str_contains($v, 'array')) {
+                $r[$k] = Request::instance()->param($k . '/a');
+            } else {
+                $r[$k] = Request::instance()->param($k);
+            }
         }
         return $r;
     }
