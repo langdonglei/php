@@ -11,7 +11,7 @@ use think\Config;
 
 class ThinkPHP
 {
-    public static function validate($rule, $message = [])
+    public static function validate($rule, $message = []): array
     {
         $validate = new Validate($rule, $message);
         $validate->check(Request::instance()->param());
