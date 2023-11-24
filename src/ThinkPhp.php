@@ -9,7 +9,7 @@ use think\Response;
 use think\Validate;
 use think\Config;
 
-class ThinkPhp
+class ThinkPHP
 {
     public static function validate($rule, $message = [])
     {
