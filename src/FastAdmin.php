@@ -23,6 +23,25 @@ class FastAdmin
     const ADDON_JS    = __DIR__ . '/../../../public/assets/js/addons.js';
     const ADDON_EXTRA = __DIR__ . '/../../../application/extra/addons.php';
 
+    public static function user_register(): array
+    {
+        $param = ThinkPHP::validate([
+            'type'             => 'require|in:username',
+            'username'         => 'requireIf:type,username',
+            'password'         => 'requireIf:type,username',
+            'password_confirm' => 'requireIf:type,username|confirm:password',
+        ]);
+        $auth  = Auth::instance();
+        if ($auth->register($param['username'], $param['password'])) {
+            return [
+                'token' => $auth->getToken(),
+                'user'  => $auth->getUserinfo()
+            ];
+        } else {
+            throw new \Exception($auth->getError());
+        }
+    }
+
     public static function user_update_password()
     {
         $param = ThinkPHP::validate([
@@ -72,7 +91,7 @@ class FastAdmin
         $auth->direct($user['id']);
         return [
             'token' => $auth->getToken(),
-            'user'  => $auth->getUser()
+            'user'  => $auth->getUserinfo()
         ];
     }
 
