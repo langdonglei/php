@@ -28,8 +28,7 @@ class StartByThink extends Command
 
     protected function execute(Input $input, Output $output)
     {
-        $gateway_port  = 4001;
-        $handler       = \vv\Worker::class;
+        $handler = \vv\Worker::class;
         if (!class_exists($handler)) {
             throw new Exception('handler ' . $handler . '不存在');
         }
@@ -45,7 +44,7 @@ class StartByThink extends Command
         $business->registerAddress = '127.0.0.1:1236';
         $business->eventHandler    = $handler;
 
-        $gateway                       = new Gateway('websocket://0.0.0.0:' . $gateway_port);
+        $gateway                       = new Gateway('websocket://0.0.0.0:4001');
         $gateway->name                 = 'Gateway';
         $gateway->registerAddress      = '127.0.0.1:1236';
         $gateway->pingInterval         = 444;
