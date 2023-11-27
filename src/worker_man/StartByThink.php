@@ -47,7 +47,7 @@ class StartByThink extends Command
         $gateway                       = new Gateway('websocket://0.0.0.0:4001');
         $gateway->name                 = 'Gateway';
         $gateway->registerAddress      = '127.0.0.1:1236';
-        $gateway->pingInterval         = 444;
+        $gateway->pingInterval         = 4444;
         $gateway->pingNotResponseLimit = 2;
         $gateway->pingData             = json_encode(['type' => 'ping']);
 
