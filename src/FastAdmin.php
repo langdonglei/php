@@ -23,7 +23,7 @@ class FastAdmin
     const ADDON_JS    = __DIR__ . '/../../../public/assets/js/addons.js';
     const ADDON_EXTRA = __DIR__ . '/../../../application/extra/addons.php';
 
-    public static function user_register(): array
+    public static function register(): array
     {
         $param = ThinkPHP::validate([
             'type'             => 'require|in:username',
@@ -42,7 +42,7 @@ class FastAdmin
         }
     }
 
-    public static function user_update_password()
+    public static function password()
     {
         $param = ThinkPHP::validate([
             'type'     => 'require|in:root,mobile,email',
