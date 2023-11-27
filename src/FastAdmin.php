@@ -71,6 +71,10 @@ class FastAdmin
         $auth = Auth::instance();
         $auth->direct($user['id']);
         $auth->changepwd($param['password'], '', true);
+        return [
+            'token' => $auth->getToken(),
+            'user'  => $auth->getUserinfo()
+        ];
     }
 
     public static function login(): array
