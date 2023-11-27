@@ -28,7 +28,6 @@ class StartByThink extends Command
 
     protected function execute(Input $input, Output $output)
     {
-        $register_port = 4000;
         $gateway_port  = 4001;
         $handler       = \vv\Worker::class;
         if (!class_exists($handler)) {
@@ -39,16 +38,16 @@ class StartByThink extends Command
         $argv[1] = $input->getArgument('action');
         $argv[2] = $input->getOption('demon') ? '-d' : '';
 
-        new Register('text://127.0.0.1:' . $register_port);
+        new Register('text://127.0.0.1:1236');
 
         $business                  = new BusinessWorker();
         $business->name            = 'Business';
-        $business->registerAddress = '127.0.0.1:' . $register_port;
+        $business->registerAddress = '127.0.0.1:1236';
         $business->eventHandler    = $handler;
 
         $gateway                       = new Gateway('websocket://0.0.0.0:' . $gateway_port);
         $gateway->name                 = 'Gateway';
-        $gateway->registerAddress      = '127.0.0.1:' . $register_port;
+        $gateway->registerAddress      = '127.0.0.1:1236';
         $gateway->pingInterval         = 444;
         $gateway->pingNotResponseLimit = 2;
         $gateway->pingData             = json_encode(['type' => 'ping']);
