@@ -9,6 +9,7 @@ use think\Config;
 use think\Db;
 use think\Exception;
 use Throwable;
+use vv\User;
 
 class FastAdmin
 {
@@ -19,6 +20,28 @@ class FastAdmin
 
     const ADDON_JS    = __DIR__ . '/../../../public/assets/js/addons.js';
     const ADDON_EXTRA = __DIR__ . '/../../../application/extra/addons.php';
+
+    public static function login($user_model): array
+    {
+        $param = ThinkPhp::validate([
+            'type'     => 'require|in:username',
+            'username' => 'requireIf:type,username',
+            'password' => 'requireIf:type,username'
+        ]);
+        $user  = $user_model::where('username', $param['username'])->find();
+        if (!$user) {
+            throw new \Exception('登录失败');
+        }
+        if ($user['password'] != FastAdmin::encrypt($param['password'], $user['salt'])) {
+            throw new \Exception('登录失败');
+        }
+        $auth = Auth::instance();
+        $auth->direct($user['id']);
+        return [
+            'token' => $auth->getToken(),
+            'user'  => $auth->getUser()
+        ];
+    }
 
     public static function generate_token($user_id, $expire = 0)
     {
