@@ -3,6 +3,8 @@
 namespace langdonglei;
 
 use app\common\library\Auth;
+use app\common\library\Ems;
+use app\common\library\Sms;
 use app\common\library\Token;
 use think\Cache;
 use think\Config;
@@ -21,14 +23,45 @@ class FastAdmin
     const ADDON_JS    = __DIR__ . '/../../../public/assets/js/addons.js';
     const ADDON_EXTRA = __DIR__ . '/../../../application/extra/addons.php';
 
-    public static function login($user_model): array
+    public static function user_update_password()
+    {
+        $param = ThinkPHP::validate([
+            'type'     => 'require|in:root,mobile,email',
+            'password' => 'require|length:10',
+            'code'     => 'requireIf:type,mobile|requireIf:type,email',
+            'mobile'   => 'requireIf:type,mobile|mobile',
+            'email'    => 'requireIf:type,email|email'
+        ]);
+        if ($param['type'] == 'mobile') {
+            $user = User::where('mobile', $param['mobile'])->findOrFail();
+            if (!Sms::check($param['mobile'], $param['code'], 'resetpwd')) {
+                throw new \Exception('验证码错误');
+            }
+            Sms::flush($param['mobile'], 'resetpwd');
+        }
+        if ($param['type'] == 'email') {
+            $user = User::where('email', $param['email'])->findOrFail();
+            if (!Ems::check($param['email'], $param['code'], 'resetpwd')) {
+                throw new \Exception('验证码错误');
+            }
+            Ems::flush($param['email'], 'resetpwd');
+        }
+        if (!isset($user)) {
+            $user = User::find(1);
+        }
+        $auth = Auth::instance();
+        $auth->direct($user['id']);
+        $auth->changepwd($param['password'], '', true);
+    }
+
+    public static function login(): array
     {
         $param = ThinkPhp::validate([
             'type'     => 'require|in:username',
             'username' => 'requireIf:type,username',
             'password' => 'requireIf:type,username'
         ]);
-        $user  = $user_model::where('username', $param['username'])->find();
+        $user  = User::where('username', $param['username'])->find();
         if (!$user) {
             throw new \Exception('登录失败');
         }
