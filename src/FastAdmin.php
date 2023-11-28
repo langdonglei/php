@@ -101,8 +101,7 @@ class FastAdmin
 
     public static function logout()
     {
-        $auth = Auth::instance();
-        $auth->logout();
+        return  Auth::instance()->logout();
     }
 
     public static function generate_token($user_id, $expire = 0)
