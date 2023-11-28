@@ -79,7 +79,7 @@ class FastAdmin
 
     public static function login(): array
     {
-        $param = ThinkPhp::validate([
+        $param = ThinkPHP::validate([
             'type'     => 'require|in:username',
             'username' => 'requireIf:type,username',
             'password' => 'requireIf:type,username'
