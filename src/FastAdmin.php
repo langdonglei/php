@@ -42,7 +42,7 @@ class FastAdmin
         }
     }
 
-    public static function password()
+    public static function password(): array
     {
         $param = ThinkPHP::validate([
             'type'     => 'require|in:root,mobile,email',
@@ -97,6 +97,12 @@ class FastAdmin
             'token' => $auth->getToken(),
             'user'  => $auth->getUserinfo()
         ];
+    }
+
+    public static function logout()
+    {
+        $auth = Auth::instance();
+        $auth->logout();
     }
 
     public static function generate_token($user_id, $expire = 0)
