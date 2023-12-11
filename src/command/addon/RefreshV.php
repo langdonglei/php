@@ -44,7 +44,7 @@ class RefreshV extends Command
         // 复制 application 和 public
         foreach (['application', 'public'] as $item) {
             if (is_dir($name_dir . $item)) {
-                copydirs($name_dir . $item, ROOT_PATH . $name_dir);
+                copydirs($name_dir . $item, ROOT_PATH . $item);
             }
         }
 
