@@ -86,9 +86,6 @@ class File
 
     public static function zip($dir, $package = '')
     {
-
-
-
         if (!is_dir($dir)) {
             throw new Exception('zip dir not exist');
         }
@@ -100,7 +97,8 @@ class File
         foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir), RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
             if (!$file->isDir()) {
                 $real_path     = $file->getRealPath();
-                $relative_path = str_replace(DIRECTORY_SEPARATOR, '/', substr($real_path, strlen($dir)));
+                // todo 如果绝对路径中有多个同名 dir
+                $relative_path = substr($real_path, strpos($real_path, $dir) + 1 + strlen($dir));
                 $handler->addFile($real_path, $relative_path);
             }
         }
