@@ -86,6 +86,8 @@ class File
 
     public static function zip($dir, $package = '')
     {
+
+
         if (!is_dir($dir)) {
             throw new Exception('zip dir not exist');
         }
