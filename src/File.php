@@ -88,6 +88,7 @@ class File
     {
 
 
+
         if (!is_dir($dir)) {
             throw new Exception('zip dir not exist');
         }
