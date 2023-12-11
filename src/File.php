@@ -84,30 +84,25 @@ class File
         }
     }
 
-//    public static function zip($target, $out = '', $exclude = [])
-//    {
-//        self::exist($target);
-//        $exclude = array_merge(['.git', '.DS_Store', 'Thumbs.db'], $exclude);
-//        if (empty($out)) {
-//            $out = $target . '.zip';
-//        }
-//        $zipArchive = new ZipArchive;
-//        $zipArchive->open($out, ZipArchive::CREATE | ZipArchive::OVERWRITE);
-//        $iterator = new RecursiveIteratorIterator(
-//            new RecursiveDirectoryIterator($target),
-//            RecursiveIteratorIterator::LEAVES_ONLY
-//        );
-//        foreach ($iterator as $file) {
-//            if (!$file->isDir()) {
-//                $filePath     = $file->getRealPath();
-//                $relativePath = str_replace(DIRECTORY_SEPARATOR, '/', substr($filePath, strlen($target)));
-//                if (!in_array($file->getFilename(), $exclude)) {
-//                    $zipArchive->addFile($filePath, $relativePath);
-//                }
-//            }
-//        }
-//        $zipArchive->close();
-//    }
+    public static function zip($dir, $package = '')
+    {
+        if (!is_dir($dir)) {
+            throw new Exception('zip dir not exist');
+        }
+        if (!$package) {
+            $package = $dir . '.zip';
+        }
+        $handler = new ZipArchive;
+        $handler->open($package, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+        foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir), RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
+            if (!$file->isDir()) {
+                $real_path     = $file->getRealPath();
+                $relative_path = str_replace(DIRECTORY_SEPARATOR, '/', substr($real_path, strlen($dir)));
+                $handler->addFile($real_path, $relative_path);
+            }
+        }
+        $handler->close();
+    }
 
 //    public static function unzip($target, $out = '')
 //    {
