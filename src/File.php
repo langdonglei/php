@@ -96,9 +96,10 @@ class File
         $handler->open($package, ZipArchive::CREATE | ZipArchive::OVERWRITE);
         foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir), RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
             if (!$file->isDir()) {
-                $real_path     = $file->getRealPath();
+                $real_path = $file->getRealPath();
                 // todo 如果绝对路径中有多个同名 dir
-                $relative_path = substr($real_path, strpos($real_path, $dir) + 1 + strlen($dir));
+                $offset        = strpos($real_path, rtrim($dir, '/')) + 1 + strlen(rtrim($dir, '/'));
+                $relative_path = substr($real_path, $offset);
                 $handler->addFile($real_path, $relative_path);
             }
         }
