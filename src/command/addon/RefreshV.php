@@ -12,7 +12,7 @@ class RefreshV extends Command
 {
     protected function configure()
     {
-        $this->setName('refresh:v');
+        $this->setName('v:refresh');
     }
 
     protected function execute(Input $input, Output $output)
