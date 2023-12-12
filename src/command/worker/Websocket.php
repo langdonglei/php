@@ -36,7 +36,10 @@ class Websocket extends Command
                     'client_id' => $client_id
                 ]));
             }
-            public static function onMessage(){}
+
+            public static function onMessage()
+            {
+            }
         });
 
         // wss服务证书
@@ -61,6 +64,7 @@ class Websocket extends Command
         // $gateway->transport = 'ssl';
 
         Worker::$logFile = getcwd() . '/worker.log';
+        Worker::$pidFile = '/var/run/worker.pid';
         Worker::runAll();
     }
 }
