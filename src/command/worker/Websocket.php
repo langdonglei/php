@@ -11,11 +11,11 @@ use think\console\Input;
 use think\console\input\Argument;
 use think\console\Output;
 
-class Start extends Command
+class Websocket extends Command
 {
     protected function configure()
     {
-        $this->setName('v:worker')->addArgument('action', Argument::OPTIONAL, '', 'restart');
+        $this->setName('v:websocket')->addArgument('action', Argument::OPTIONAL, '', 'restart');
     }
 
     protected function execute(Input $input, Output $output)
