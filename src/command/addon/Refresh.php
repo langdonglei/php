@@ -8,7 +8,7 @@ use think\console\Command;
 use think\console\Input;
 use think\console\Output;
 
-class RefreshV extends Command
+class Refresh extends Command
 {
     protected function configure()
     {
