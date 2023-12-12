@@ -63,9 +63,9 @@ class Websocket extends Command
         $gateway->lanIp = '127.0.0.1';
         // $gateway->transport = 'ssl';
 
-        // Worker::$logFile = getcwd() . '/worker.log';
-        Worker::$stdoutFile = getcwd() . '/worker.log';
-        Worker::$pidFile = '/var/run/worker.pid';
+        Worker::$stdoutFile = '/dev/null';
+        Worker::$logFile    = '/dev/null';
+        Worker::$pidFile    = '/var/run/worker.pid';
         Worker::runAll();
     }
 }
