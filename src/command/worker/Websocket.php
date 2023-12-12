@@ -64,6 +64,7 @@ class Websocket extends Command
         // $gateway->transport = 'ssl';
 
         // Worker::$logFile = getcwd() . '/worker.log';
+        Worker::$stdoutFile = getcwd() . '/worker.log';
         Worker::$pidFile = '/var/run/worker.pid';
         Worker::runAll();
     }
