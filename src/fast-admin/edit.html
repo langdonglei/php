@@ -1,0 +1,185 @@
+<form class="form-horizontal" method="POST" action="">
+
+    <!--text-->
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">name</label>
+        <div class="col-xs-12 col-sm-8">
+            <input type="text" class="form-control" name="row[name]" value="{$row.name??''}">
+        </div>
+    </div>
+
+    <!--number-->
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">number</label>
+        <div class="col-xs-12 col-sm-8">
+            <input type="number" class="form-control" name="row[number]" value="{$row.number??''}">
+        </div>
+    </div>
+
+    <!--switch-->
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">switch</label>
+        <div class="col-xs-12 col-sm-8">
+            <input type="hidden" id="switch_is" name="row[switch_is]" value="{$row.switch_is??0}">
+            <a href="#" class="btn-switcher"
+               data-toggle="switcher"
+               data-input-id="switch_is"
+               data-yes="1"
+               data-no="0"
+            ><i class="fa fa-toggle-on text-success fa-2x {if ($row.switch_is??0)==0}fa-flip-horizontal text-gray{/if}"></i></a>
+        </div>
+    </div>
+
+    <!--radio-->
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">radio</label>
+        <div class="col-xs-12 col-sm-8">
+            <div class="radio">
+                <label>
+                    <input type="radio" name="row[type]" value="0" {if ($row.type??0)==0}checked{/if}>
+                    <span>type0</span>
+                </label>
+                <label>
+                    <input type="radio" name="row[type]" value="1" {if ($row.type??1)==1}checked{/if}>
+                    <span>type1</span>
+                </label>
+                <div data-favisible="type=0" class="p-3">type0</div>
+                <div data-favisible="type=1" class="p-3">type1</div>
+            </div>
+        </div>
+    </div>
+
+    <!--datetimepicker-->
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">datetimepicker</label>
+        <div class="col-xs-12 col-sm-8">
+            <input type="text" class="form-control datetimepicker" name="row[time]" value="{$row.time??''}">
+        </div>
+    </div>
+
+    <!--selectpage-->
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">selectpage</label>
+        <div class="col-xs-12 col-sm-8">
+            <input class="form-control selectpage" name="row[user_id]" value="{$row.user_id??0}"
+                   data-source="user/user/index"
+                   data-field="nickname"
+                   data-params='{"custom[group_id]":1}'
+                   data-primary-key="id"
+                   data-pagination="true"
+                   data-page-size="10"
+                   data-multiple="false"
+                   data-max-select-limit="5"
+            >
+        </div>
+    </div>
+
+    <!--upload-->
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">upload</label>
+        <div class="col-xs-12 col-sm-8">
+            <div class="input-group">
+                <input id="image-input" class="form-control" name="row[image]" value="{$row.image??''}">
+                <div class="input-group-addon no-border no-padding">
+                    <button type="button" class="btn btn-danger faupload"
+                            data-input-id="image-input"
+                            data-preview-id="image-preview"
+                            data-multiple="false"
+                            data-mimetype="image/*"
+                    >上传
+                    </button>
+                    <button type="button" class="btn btn-primary fachoose"
+                            data-input-id="image-input"
+                            data-multiple="false"
+                            data-mimetype="image/*"
+                    >选择
+                    </button>
+                </div>
+            </div>
+            <ul class="row list-inline faupload-preview" id="image-preview"></ul>
+        </div>
+    </div>
+
+    <!--fieldlist-->
+    <div class="form-group row">
+        <label class="control-label col-xs-12 col-sm-2">fieldlist</label>
+        <textarea name="row[info]" class="hidden">{:is_array($row.info)?json_encode($row.info):$row.info}</textarea>
+        <div class="col-xs-12 col-sm-8">
+            <table id="second-table" class="table fieldlist" data-template="tpl-table" data-name="row[info]">
+                <tr>
+                    <td>名称</td>
+                    <td>日期</td>
+                    <td>优惠券</td>
+                    <td>图片</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <a href="#" class="btn btn-sm btn-success btn-append">
+                            <i class="fa fa-plus"></i>
+                            <span> 添加</span>
+                        </a>
+                    </td>
+                </tr>
+            </table>
+            <script id="tpl-table" type="text/html">
+                <tr class="form-inline">
+                    <td>
+                        <input size="1" class="form-control" name="<%=name%>[<%=index%>][title]" value="<%=row.title%>"/>
+                    </td>
+                    <td>
+                        <input size="15" name="<%=name%>[<%=index%>][time]" class="form-control datetimepicker" value="<%=row.time%>"/>
+                    </td>
+                    <td>
+                        <input size="22" name="<%=name%>[<%=index%>][coupon]" value="<%=row.coupon%>" class="form-control selectpage" data-source="user/user/index" data-field="nickname"/>
+                    </td>
+                    <td>
+                        <div style="display: inline-block">
+                            <div class="input-group">
+                                <input id="image-input-<%=index%>" class="form-control" name="<%=name%>[<%=index%>][image]" value="<%=row.image%>">
+                                <div class="input-group-addon no-border no-padding">
+                                    <button type="button" class="btn btn-danger faupload"
+                                            data-input-id="image-input-<%=index%>"
+                                            data-preview-id="image-preview-<%=index%>"
+                                            data-multiple="false"
+                                            data-mimetype="image/*"
+                                    >上传
+                                    </button>
+                                </div>
+                            </div>
+                            <ul class="row list-inline plupload-preview" id="image-preview-<%=index%>" data-template="tpl-preview"></ul>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="btn btn-sm btn-danger btn-remove"><i class="fa fa-times"></i></span>
+                        <span class="btn btn-sm btn-primary btn-dragsort hidden"><i class="fa fa-arrows"></i></span>
+                    </td>
+                </tr>
+            </script>
+            <script id="tpl-preview" type="text/html">
+                <li>
+                    <a href="<%=fullurl%>" data-url="<%=url%>" target="_blank" class="thumbnail">
+                        <img src="<%=fullurl%>" class="img-responsive" alt="">
+                    </a>
+                    <a href="#" class="btn btn-danger btn-xs btn-trash"><i class="fa fa-trash"></i></a>
+                </li>
+            </script>
+        </div>
+    </div>
+
+    <!--content-->
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">content</label>
+        <div class="col-xs-12 col-sm-8">
+            <textarea class="form-control editor" name="row[content]">{$row.content}</textarea>
+        </div>
+    </div>
+
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-primary btn-embossed disabled">确定</button>
+            <button type="reset" class="btn btn-default btn-embossed">重置</button>
+        </div>
+    </div>
+</form>
