@@ -136,4 +136,79 @@ class WeChat
             'key'        => Env::get('wechat.mini_app_mch_v2'),
         ])->success()->send();
     }
+
+    public static function mp_submit($token)
+    {
+        $arr = [$token, $_GET["timestamp"], $_GET["nonce"]];
+        sort($arr, SORT_STRING);
+        if ($_GET["signature"] == sha1(implode($arr))) {
+            echo $_GET["echostr"];
+        }
+    }
+
+    public static function mp_js_sdk($url, $app_id, $app_secret): array
+    {
+        $js_api_list = [
+            'updateAppMessageShareData',
+            'updateTimelineShareData',
+            'onMenuShareTimeline', // 即将废弃
+            'onMenuShareAppMessage', // 即将废弃
+            'onMenuShareQQ', // 即将废弃
+            'onMenuShareWeibo',
+            'onMenuShareQZone',
+            'startRecord',
+            'stopRecord',
+            'onVoiceRecordEnd',
+            'playVoice',
+            'pauseVoice',
+            'stopVoice',
+            'onVoicePlayEnd',
+            'uploadVoice',
+            'downloadVoice',
+            'chooseImage',
+            'previewImage',
+            'uploadImage',
+            'downloadImage',
+            'translateVoice',
+            'getNetworkType',
+            'openLocation',
+            'getLocation',
+            'hideOptionMenu',
+            'showOptionMenu',
+            'hideMenuItems',
+            'showMenuItems',
+            'hideAllNonBaseMenuItem',
+            'showAllNonBaseMenuItem',
+            'closeWindow',
+            'scanQRCode',
+            'openProductSpecificView',
+            'addCard',
+            'chooseCard',
+            'openCard'
+        ];
+        $timestamp   = time();
+        $nonceStr    = substr(md5($timestamp), 0, 15);
+        $token       = file_get_contents("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$app_id&secret=$app_secret");
+        $token       = json_decode($token, true)['access_token'];
+        $ticket      = file_get_contents("https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=$token&type=jsapi");
+        $ticket      = json_decode($ticket, true)['ticket'];
+        $signature   = sha1("jsapi_ticket=$ticket&noncestr=$nonceStr&timestamp=$timestamp&url=$url");
+        return [
+            'appId'     => $app_id,
+            'timestamp' => $timestamp,
+            'nonceStr'  => $nonceStr,
+            'signature' => $signature,
+            'jsApiList' => $js_api_list
+        ];
+    }
+
+    public static function mp_grant($app_id, $app_secret)
+    {
+        // <a href="https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx726f762a9fbcdaeb&redirect_uri=http://gv2wjv.natappfree.cc/code.php&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect">授权登录</a>
+        $code = $_GET['code'];
+        $r    = file_get_contents("https://api.weixin.qq.com/sns/oauth2/access_token?appid=$app_id&secret=$app_secret&code=$code&grant_type=authorization_code");
+        $r    = json_decode($r, true);
+        $s    = file_get_contents("https://api.weixin.qq.com/sns/userinfo?access_token=$r[access_token]&openid=$r[openid]&lang=zh_CN");
+        return json_decode($s, true);
+    }
 }
