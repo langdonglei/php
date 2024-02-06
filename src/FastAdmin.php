@@ -337,4 +337,34 @@ EOF
             'nickname'
         ])->findOrFail();
     }
+    
+    public static function area_for_uni_data_picker(){
+        $data = Db::table('area')->column('id as value, pid, name as text, level');
+        $r    = [];
+        foreach ($data as $province) {
+            if ($province['level'] === 1) {
+                unset($province['level'], $province['pid']);
+                $r[$province['value']] = $province;
+                foreach ($data as $city) {
+                    if ($city['level'] === 2 && $city['pid'] === $province['value']) {
+                        unset($city['level'], $city['pid']);
+                        $r[$province['value']]['children'][$city['value']] = $city;
+                        foreach ($data as $area) {
+                            if ($area['level'] === 3 && $area['pid'] === $city['value']) {
+                                unset($area['level'], $area['pid']);
+                                $r[$province['value']]['children'][$city['value']]['children'][$area['value']] = $area;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        array_walk($r, function (&$province) {
+            $province['children'] = array_values($province['children']);
+            array_walk($province['children'], function (&$city) {
+                $city['children'] = array_values($city['children']);
+            });
+        });
+        return array_values($r);
+    }
 }
