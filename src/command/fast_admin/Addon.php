@@ -1,6 +1,6 @@
 <?php
 
-namespace langdonglei\command\addon;
+namespace langdonglei\command\fast_admin;
 
 use langdonglei\File;
 use think\addons\Service;
@@ -8,11 +8,11 @@ use think\console\Command;
 use think\console\Input;
 use think\console\Output;
 
-class Refresh extends Command
+class Addon extends Command
 {
     protected function configure()
     {
-        $this->setName('v:refresh');
+        $this->setName('vv:addon');
     }
 
     protected function execute(Input $input, Output $output)
