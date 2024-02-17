@@ -89,7 +89,7 @@ EOD;
         $handle->open('C:\\Users\\vv\\Desktop\\vv.zip', ZipArchive::CREATE | ZipArchive::OVERWRITE);
         $dir = ADDON_PATH . 'vv';
         foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir), RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
-            if (!$file->isDir()) {
+            if (!$file->isDir() && $file->getFilename() != '.addonrc') {
                 $real_path     = $file->getRealPath();
                 $relative_path = substr($real_path, strlen($dir) + 1);
                 if (PHP_OS == 'WINNT') {
