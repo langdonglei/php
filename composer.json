@@ -5,7 +5,7 @@
     "symfony/console": "^5.4",
     "ext-zip": "*",
     "symfony/var-dumper": "^5.4",
-    "nelexa/zip": "^3",
+    "nelexa/zip": "*",
     "ext-json": "*",
     "guzzlehttp/guzzle": "^6",
     "ext-gd": "*",
