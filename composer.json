@@ -7,7 +7,7 @@
     "symfony/var-dumper": "^5.4",
     "nelexa/zip": "*",
     "ext-json": "*",
-    "guzzlehttp/guzzle": "^6",
+    "guzzlehttp/guzzle": "*",
     "ext-gd": "*",
     "endroid/qrcode": "^4.6",
     "wechatpay/wechatpay": "^1.4",
