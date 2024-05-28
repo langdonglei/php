@@ -34,6 +34,7 @@ class Think
                 'data' => null,
             ], 'json'));
         }
+
         $r = [];
         foreach ($rule as $k => $v) {
             if (!is_array($v)) {
@@ -49,12 +50,31 @@ class Think
         return $r;
     }
 
+    public static function env($name, $exception = true)
+    {
+        if (!class_exists('\think\Env')) {
+            throw new Exception('vv not found class \think\Env');
+        }
+
+        $r = \think\Env::get($name);
+        if ($exception && !$r) {
+            throw new Exception('vv not found env ' . $name);
+        }
+
+        return $r;
+    }
+
     public static function config($name, $exception = true)
     {
-        $r = \think\Config($name);
-        if (!$r && $exception) {
-            throw new Exception("config not found $name");
+        if (!class_exists('\think\Config')) {
+            throw new Exception('vv not found class \think\Config');
         }
+
+        $r = \think\Config($name);
+        if ($exception && !$r) {
+            throw new Exception('vv not found config ' . $name);
+        }
+
         return $r;
     }
 }
