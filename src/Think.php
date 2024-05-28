@@ -11,8 +11,8 @@ class Think
         if (!class_exists('\think\exception\HttpResponseException')) {
             throw new Exception('vv not found class \think\exception\HttpResponseException');
         }
-        if (!class_exists('\think\facade\Request')) {
-            throw new Exception('vv not found class \think\facade\Request');
+        if (!class_exists('\think\Request')) {
+            throw new Exception('vv not found class \think\Request');
         }
         if (!class_exists('\think\Response')) {
             throw new Exception('vv not found class \think\Response');
@@ -21,7 +21,7 @@ class Think
             throw new Exception('vv not found class \think\Validate\Validate');
         }
 
-        $request  = \think\facade\Request::instance();
+        $request  = \think\Request::instance();
         $validate = new \think\Validate\Validate();
 
         $validate->rule($rule)->message($message)->check($request->param());
