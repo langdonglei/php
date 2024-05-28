@@ -17,27 +17,23 @@ class WeChat
 
     public function __construct()
     {
-        $mini_app_id = Env::get('wechat.mini_app_id');
-        if (!$mini_app_id) {
-            throw new Exception('未配置环境变量 wechat.mini_app_id');
-        }
-        $this->mini_app_id = $mini_app_id;
-
-        $mini_app_secret = Env::get('wechat.mini_app_secret');
-        if (!$mini_app_secret) {
-            throw new Exception('未配置环境变量 wechat.mini_app_secret');
-        }
-        $this->mini_app_secret = $mini_app_secret;
-        $this->client          = new Client();
-        $str                   = $this->client->post("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$this->mini_app_id&secret=$this->mini_app_secret")->getBody()->getContents();
-        $arr                   = json_decode($str, true);
-        $this->access_token    = $arr['access_token'];
+        // $mini_app_id = Env::get('wechat.mini_app_id');
+        // if (!$mini_app_id) {
+        //     throw new Exception('未配置环境变量 wechat.mini_app_id');
+        // }
+        // $this->mini_app_id = $mini_app_id;
+        //
+        // $mini_app_secret = Env::get('wechat.mini_app_secret');
+        // if (!$mini_app_secret) {
+        //     throw new Exception('未配置环境变量 wechat.mini_app_secret');
+        // }
+        // $this->mini_app_secret = $mini_app_secret;
+        // $this->client          = new Client();
+        // $str                   = $this->client->post("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$this->mini_app_id&secret=$this->mini_app_secret")->getBody()->getContents();
+        // $arr                   = json_decode($str, true);
+        // $this->access_token    = $arr['access_token'];
     }
 
-
-    /**
-     * @throws Exception
-     */
     public function getUnlimitedQRCode($scene, $return_content = false): string
     {
         if (!$scene) {
@@ -121,7 +117,6 @@ class WeChat
         ])->verify();
     }
 
-
     public static function success(): void
     {
         Pay::wechat([
@@ -204,5 +199,25 @@ class WeChat
         $r    = json_decode($r, true);
         $s    = file_get_contents("https://api.weixin.qq.com/sns/userinfo?access_token=$r[access_token]&openid=$r[openid]&lang=zh_CN");
         return json_decode($s, true);
+    }
+
+    public static function openid($code)
+    {
+        $url                    = 'https://api.weixin.qq.com/sns/jscode2session?'
+            . http_build_query([
+                'appid'      => Think::env('wechat.mini_id'),
+                'secret'     => Think::env('wechat.mini_secret'),
+                'js_code'    => $code,
+                'grant_type' => 'authorization_code',
+            ]);
+        $client                 = new Client();
+        $body                   = $client->get($url)->getBody()->getContents();
+        $openid_and_session_key = json_decode($body, true);
+        $openid                 = $openid_and_session_key['openid'] ?? '';
+        if (!$openid) {
+            throw new Exception('error oid');
+        }
+
+        return $openid;
     }
 }
