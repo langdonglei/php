@@ -215,7 +215,7 @@ class WeChat
         $openid_and_session_key = json_decode($body, true);
         $openid                 = $openid_and_session_key['openid'] ?? '';
         if (!$openid) {
-            throw new Exception('error oid');
+            throw new Exception($body);
         }
 
         return $openid;
