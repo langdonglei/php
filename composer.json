@@ -9,7 +9,8 @@
     "ext-gd": "*",
     "ext-mbstring": "*",
     "workerman/gateway-worker": "^3.1",
-    "jpush/jpush": "^3.6"
+    "jpush/jpush": "^3.6",
+    "symfony/var-dumper": "^5.4"
   },
   "config": {
     "preferred-install": "dist",
