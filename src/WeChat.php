@@ -12,15 +12,9 @@ class WeChat
 {
     protected $mini_app_id;
     protected $mini_app_secret;
-    /**
-     * @var mixed
-     */
-    protected      $access_token;
-    private Client $client;
+    protected $access_token;
+    protected $client;
 
-    /**
-     * @throws Exception
-     */
     public function __construct()
     {
         $mini_app_id = Env::get('wechat.mini_app_id');
