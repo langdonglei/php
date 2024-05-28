@@ -17,12 +17,12 @@ class Think
         if (!class_exists('\think\Response')) {
             throw new Exception('vv not found class \think\Response');
         }
-        if (!class_exists('\think\Validate\Validate')) {
-            throw new Exception('vv not found class \think\Validate\Validate');
+        if (!class_exists('\think\Validate')) {
+            throw new Exception('vv not found class \think\Validate');
         }
 
         $request  = \think\Request::instance();
-        $validate = new \think\Validate\Validate();
+        $validate = new \think\Validate();
 
         $validate->rule($rule)->message($message)->check($request->param());
         $error = $validate->getError();
