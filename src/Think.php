@@ -40,6 +40,9 @@ class Think
             }
             if (in_array('array', $v)) {
                 $r[$k] = $request->param($k . '/a');
+            }
+            if (in_array('boolean', $v)) {
+                $r[$k] = $request->param($k . '/b');
             } else {
                 $r[$k] = $request->param($k);
             }
