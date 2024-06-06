@@ -76,7 +76,7 @@ class Think
         return $r;
     }
 
-    public static function ok($data = [])
+    public static function ok($data = [], $header = [])
     {
         PHP::class_exists([
             '\think\Request',
@@ -88,10 +88,10 @@ class Think
             'msg'  => '',
             'time' => \think\Request::instance()->server('REQUEST_TIME'),
             'data' => $data,
-        ], 'json'));
+        ], 'json')->header($header));
     }
 
-    public static function ng($msg = '')
+    public static function ng($msg = '', $header = [])
     {
         PHP::class_exists([
             '\think\Request',
@@ -103,6 +103,6 @@ class Think
             'msg'  => $msg,
             'time' => \think\Request::instance()->server('REQUEST_TIME'),
             'data' => [],
-        ], 'json'));
+        ], 'json')->header($header));
     }
 }
