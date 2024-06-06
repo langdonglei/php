@@ -75,4 +75,34 @@ class Think
 
         return $r;
     }
+
+    public static function ok($data = [])
+    {
+        PHP::class_exists([
+            '\think\Request',
+            '\think\exception\HttpResponseException',
+        ]);
+
+        throw new \think\exception\HttpResponseException(\think\Response::create([
+            'code' => 1,
+            'msg'  => '',
+            'time' => \think\Request::instance()->server('REQUEST_TIME'),
+            'data' => $data,
+        ], 'json'));
+    }
+
+    public static function ng($msg = '')
+    {
+        PHP::class_exists([
+            '\think\Request',
+            '\think\exception\HttpResponseException',
+        ]);
+
+        throw new \think\exception\HttpResponseException(\think\Response::create([
+            'code' => 1,
+            'msg'  => $msg,
+            'time' => \think\Request::instance()->server('REQUEST_TIME'),
+            'data' => [],
+        ], 'json'));
+    }
 }
