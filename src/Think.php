@@ -76,7 +76,7 @@ class Think
         return $r;
     }
 
-    public static function ok($data = [], $header = [])
+    public static function ok($data = null, $header = [])
     {
         PHP::class_exists([
             '\think\Request',
