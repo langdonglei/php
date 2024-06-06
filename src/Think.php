@@ -99,7 +99,7 @@ class Think
         ]);
 
         throw new \think\exception\HttpResponseException(\think\Response::create([
-            'code' => 1,
+            'code' => 0,
             'msg'  => $msg,
             'time' => \think\Request::instance()->server('REQUEST_TIME'),
             'data' => [],
