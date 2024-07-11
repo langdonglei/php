@@ -41,7 +41,7 @@ class Think
             if (in_array('array', $v) && !is_array($data[$k])) {
                 dd('需要处理');
             } else {
-                $r[$k] = $data[$k];
+                $r[$k] = $data[$k] ?? '';
             }
         }
         return $r;
