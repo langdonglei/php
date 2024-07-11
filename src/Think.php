@@ -20,7 +20,10 @@ class Think
         }
         $request  = \think\Request::instance();
         $validate = new \think\Validate();
-        $validate->rule($rule)->message($message)->check($data ?: $request->param());
+        if (!$data) {
+            $data = $request->param();
+        }
+        $validate->rule($rule)->message($message)->check($data);
         $error = $validate->getError();
         if ($error) {
             throw new \think\exception\HttpResponseException(\think\Response::create([
