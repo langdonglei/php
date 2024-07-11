@@ -18,10 +18,8 @@ class Think
         if (!class_exists('\think\Validate')) {
             throw new \Exception('vv not found class \think\Validate');
         }
-
         $request  = \think\Request::instance();
         $validate = new \think\Validate();
-
         $validate->rule($rule)->message($message)->check($data ?: $request->param());
         $error = $validate->getError();
         if ($error) {
@@ -32,19 +30,17 @@ class Think
                 'data' => null,
             ], 'json'));
         }
-
         $r = [];
         foreach ($rule as $k => $v) {
             if (!is_array($v)) {
                 $v = [$v];
             }
-            if (in_array('array', $v)) {
-                $r[$k] = $request->param($k . '/a');
+            if (in_array('array', $v) && !is_array($data[$k])) {
+                dd('需要处理');
             } else {
-                $r[$k] = $request->param($k);
+                $r[$k] = $data[$k];
             }
         }
-
         return $r;
     }
 
