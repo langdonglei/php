@@ -42,7 +42,7 @@ class Think
                 dd('需要处理');
             } else {
                 // todo 不知道为什么后面会有空格 暂时先trim一下
-                $r[$k] = trim($data[$k]) ?? '';
+                $r[$k] = trim($data[$k] ?? '');
             }
         }
         return $r;
