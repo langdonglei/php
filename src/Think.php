@@ -41,7 +41,8 @@ class Think
             if (in_array('array', $v) && !is_array($data[$k])) {
                 dd('需要处理');
             } else {
-                $r[$k] = $data[$k] ?? '';
+                // todo 不知道为什么后面会有空格 暂时先trim一下
+                $r[$k] = trim($data[$k]) ?? '';
             }
         }
         return $r;
