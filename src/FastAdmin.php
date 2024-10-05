@@ -371,7 +371,7 @@ EOF
 
     public static function html($toolbar = 'refresh'): string
     {
-        return <<< EOD
+        return \think\View::instance()->display(<<< EOD
 <div class="panel panel-default panel-intro">
     {:build_heading()}
     <div class="panel-body">
@@ -387,6 +387,7 @@ EOF
         </div>
     </div>
 </div>
-EOD;
+EOD
+        );
     }
 }
