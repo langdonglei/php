@@ -101,7 +101,7 @@ class FastAdmin
 
     public static function logout()
     {
-        return  Auth::instance()->logout();
+        return Auth::instance()->logout();
     }
 
     public static function generate_token($user_id, $expire = 0)
@@ -337,8 +337,9 @@ EOF
             'nickname'
         ])->findOrFail();
     }
-    
-    public static function area_for_uni_data_picker(){
+
+    public static function area_for_uni_data_picker()
+    {
         $data = Db::table('area')->column('id as value, pid, name as text, level');
         $r    = [];
         foreach ($data as $province) {
@@ -366,5 +367,26 @@ EOF
             });
         });
         return array_values($r);
+    }
+
+    public static function htmlIndex($toolbar = 'refresh'): string
+    {
+        return <<< EOD
+<div class="panel panel-default panel-intro">
+    {:build_heading()}
+    <div class="panel-body">
+        <div id="myTabContent" class="tab-content">
+            <div class="tab-pane fade active in" id="one">
+                <div class="widget-body no-padding">
+                    <div class="toolbar">
+                        {:build_toolbar('$toolbar')}
+                    </div>
+                    <table id="table" class="table table-striped table-bordered table-hover table-nowrap"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+EOD;
     }
 }
