@@ -369,7 +369,7 @@ EOF
         return array_values($r);
     }
 
-    public static function htmlIndex($toolbar = 'refresh'): string
+    public static function html($toolbar = 'refresh'): string
     {
         return <<< EOD
 <div class="panel panel-default panel-intro">
