@@ -1,205 +1,157 @@
 <?php
-
-ConsoleOut("欢迎使用内网穿透 natapp-php v1.40\r\nCtrl+C 退出");
-set_time_limit(0); //设置执行时间
-ignore_user_abort(true);
-error_reporting(E_ALL ^ E_NOTICE ^ E_WARNING);
-
 if (version_compare(phpversion(), '5.6.0', '<')) {
-    ConsoleOut('运行需 PHP 5.6以上');
-    exit();
+    exit('运行需 PHP 5.6以上');
+} else {
+    echo '1.40' . PHP_EOL;
 }
-
-//检测大小端
+set_time_limit(0);
+ignore_user_abort(1);
+error_reporting(E_ALL ^ E_NOTICE ^ E_WARNING);
 define('BIG_ENDIAN', pack('L', 1) === pack('N', 1));
-
-$options = getopt("",
-    array(
-        "clienttoken::",
-        "authtoken::",
-    )
-);
-
-if ($options['authtoken'] == '' and $options['clienttoken'] == '') {
-    ConsoleOut("\r\n使用说明\r\n在命令行模式运行\r\nphp natapp.php --authtoken=xxxxxx\r\n如果是复合隧道请把authtoken参数换成 --clienttoken= \r\n请登录 natapp.cn获取authtoken\r\n");
-    sleep(10);
-    die();
-}
-
-$serverArr      = natapp_auth($options);
-$seraddr        = $serverArr[0]; //服务器地址
-$port           = $serverArr[1]; //端口
-$is_verify_peer = false; //是否校验证书
-
-$isDebug = false;//调试开关
-
-//定义变量
-$readfds  = array();
-$writefds = array();
-
-$e = null;
-$t = 1;
-
-$tunnels  = array();
-$socklist = array();
-
-$ClientId  = '';
-$recvflag  = true;
-$starttime = time();//启动时间
-$pingtime  = 0;
-
-//建立隧道协议
-$mainsocket = connectremote($seraddr, $port);
-if ($mainsocket) {
-    $socklist[] = array('sock' => $mainsocket, 'linkstate' => 0, 'type' => 1);
-}
-
-//注册退出执行函数
-register_shutdown_function('shutdown', $mainsocket);
-while ($recvflag) {
-
-    //重排
-    array_filter($socklist);
-    sort($socklist);
-
-    //检测控制连接是否连接.
-    if ($mainsocket == false) {
-        $ip = dnsopen($seraddr, $port);//解析dns, port
+$options        = ['authtoken' => 'd6ea6b1ee80135e3'];
+$serverArr      = auth($options);
+$seraddr        = $serverArr[0];
+$port           = $serverArr[1];
+$is_verify_peer = false;
+$isDebug        = false;
+$r              = [];
+$w              = [];
+$tunnels        = [];
+$box            = [];
+$client_id      = '';
+$start_at       = time();
+$ping_at        = 0;
+$flag           = true;
+while ($flag) {
+    array_filter($box);
+    sort($box);
+    if (empty($main)) {
+        $ip = ip($seraddr, $port);
         if (!$ip) {
-            ConsoleOut('连接natapp服务器失败.');
+            echo 'error' . PHP_EOL;
             sleep(1);
             continue;
         }
-        $mainsocket = connectremote($ip, $port);
-        if (!$mainsocket) {
-            ConsoleOut('连接natapp服务器失败.');
+        $main = connect($ip, $port);
+        if (!$main) {
+            echo 'error' . PHP_EOL;
             sleep(10);
             continue;
         }
-        $socklist[] = array('sock' => $mainsocket, 'linkstate' => 0, 'type' => 1);
+        $box[] = array('sock' => $main, 'linkstate' => 0, 'type' => 1);
     }
 
-    //如果非cli超过1小时自杀
-    if (is_cli() == false) {
-        if ($starttime + 3600 < time()) {
-            fclose($mainsocket);
-            $recvflag = false;
+    if (php_sapi_name() != 'cli') {
+        if ($start_at + 3600 < time()) {
+            fclose($main);
+            $flag = false;
             break;
         }
     }
 
-    //发送心跳
-    if ($pingtime + 25 < time() && $pingtime != 0) {
-        sendpack($mainsocket, Ping());
-        $pingtime = time();
+    if ($ping_at + 25 < time() && $ping_at != 0) {
+        send($main, '{"Type":"Ping","Payload":{}}');
+        $ping_at = time();
     }
 
     //重新赋值
-    $readfds  = array();
-    $writefds = array();
-    foreach ($socklist as $k => $z) {
-        if (is_resource($z['sock'])) {
-            $readfds[] = $z['sock'];
-            if ($z['linkstate'] == 0) {
-                $writefds[] = $z['sock'];
+    $r = [];
+    $w = [];
+    foreach ($box as $index => $item) {
+        if (is_resource($item['sock'])) {
+            $r[] = $item['sock'];
+            if ($item['linkstate'] == 0) {
+                $w[] = $item['sock'];
             }
         } else {
-            //close的时候不是资源。。移除
-            if ($z['type'] == 1) {
-                $mainsocket = false;
+            if ($item['type'] == 1) {
+                $main = false;
             }
-            unset($z['type']);
-            unset($z['sock']);
-            unset($z['tosock']);
-            unset($z['recvbuf']);
-            array_splice($socklist, $k, 1);
+            unset($item['type']);
+            unset($item['sock']);
+            unset($item['tosock']);
+            unset($item['recvbuf']);
+            array_splice($box, $index, 1);
         }
     }
 
     //查询
-    $res = stream_select($readfds, $writefds, $e, $t);
+    $res = stream_select($r, $w, $e, 1);
     if ($res === false) {
-        ConsoleOut('sockerr', 'debug');
+        var_dump($e);
     }
 
     //有事件
     if ($res > 0) {
-        foreach ($socklist as $k => $sockinfo) {
-            $sock = $sockinfo['sock'];
+        foreach ($box as $index => $info) {
+            $sock = $info['sock'];
             //可读
-            if (in_array($sock, $readfds)) {
-
-                $recvbut = fread($sock, 1024);
-
-                if ($recvbut == false || strlen($recvbut) == 0) {
+            if (in_array($sock, $r)) {
+                $receive = fread($sock, 1024);
+                if (empty($receive) || strlen($receive) == 0) {
                     //主连接关闭，关闭所有
-                    if ($sockinfo['type'] == 1) {
-                        $mainsocket = false;
+                    if ($info['type'] == 1) {
+                        $main = false;
                     }
-                    if ($sockinfo['type'] == 3) {
-                        fclose($sockinfo['tosock']);
+                    if ($info['type'] == 3) {
+                        fclose($info['tosock']);
                     }
-                    unset($sockinfo['type']);
-                    unset($sockinfo['sock']);
-                    unset($sockinfo['tosock']);
-                    unset($sockinfo['recvbuf']);
-                    unset($socklist[$k]);
+                    unset($info['type']);
+                    unset($info['sock']);
+                    unset($info['tosock']);
+                    unset($info['recvbuf']);
+                    unset($box[$index]);
                     continue;
                 }
-
-                if (strlen($recvbut) > 0) {
-                    if (!isset($sockinfo['recvbuf'])) {
-                        $sockinfo['recvbuf'] = $recvbut;
+                if (strlen($receive) > 0) {
+                    if (!isset($info['recvbuf'])) {
+                        $info['recvbuf'] = $receive;
                     } else {
-                        $sockinfo['recvbuf'] = $sockinfo['recvbuf'] . $recvbut;
+                        $info['recvbuf'] = $info['recvbuf'] . $receive;
                     }
-                    $socklist[$k] = $sockinfo;
+                    $box[$index] = $info;
                 }
-
                 //控制连接，或者远程未连接本地连接
-                if ($sockinfo['type'] == 1 || ($sockinfo['type'] == 2 && $sockinfo['linkstate'] == 1)) {
-                    $allrecvbut = $sockinfo['recvbuf'];
+                if ($info['type'] == 1 || ($info['type'] == 2 && $info['linkstate'] == 1)) {
+                    $allrecvbut = $info['recvbuf'];
                     //处理
                     $lenbuf = substr($allrecvbut, 0, 8);
                     $len    = tolen1($lenbuf);
                     if (strlen($allrecvbut) >= (8 + $len)) {
                         $json = substr($allrecvbut, 8, $len);
-                        ConsoleOut($json, 'debug');
+                        var_dump($json);
                         $js = json_decode($json, true);
-
                         //远程主连接
-                        if ($sockinfo['type'] == 1) {
+                        if ($info['type'] == 1) {
                             if ($js['Type'] == 'ReqProxy') {
-                                $newsock = connectremote($seraddr, $port);
+                                $newsock = connect($seraddr, $port);
                                 if ($newsock) {
-                                    $socklist[] = array('sock' => $newsock, 'linkstate' => 0, 'type' => 2);
+                                    $box[] = array('sock' => $newsock, 'linkstate' => 0, 'type' => 2);
                                 }
                             }
                             if ($js['Type'] == 'AuthResp') {
                                 if ($js['Payload']['Error'] != null) {
-                                    ConsoleOut($js['Payload']['Error']);
+                                    var_dump($js['Payload']['Error']);
                                     sleep(60);
                                     continue;
                                 }
-                                $ClientId = $js['Payload']['ClientId'];
-                                $pingtime = time();
-                                sendpack($sock, Ping());
+                                $client_id = $js['Payload']['ClientId'];
+                                $ping_at   = time();
+                                send($sock, Ping());
                             }
                             if ($js['Type'] == 'NewTunnel') {
                                 $tunnels[$js['Payload']['Url']] = $js['Payload'];
-                                ConsoleOut('隧道建立成功:' . $js['Payload']['Url']);//注册成功
+                                var_dump($js['Payload']['Url']);
                             }
                         }
-
                         //远程代理连接
-                        if ($sockinfo['type'] == 2) {
+                        if ($info['type'] == 2) {
                             //未连接本地
-                            if ($sockinfo['linkstate'] == 1) {
+                            if ($info['linkstate'] == 1) {
                                 if ($js['Type'] == 'StartProxy') {
                                     $loacladdr = getloacladdr($js['Payload']['Url']);
-
-                                    $ip = dnsopen($loacladdr[0], $loacladdr[1]);//解析dns, port
-                                    if (!$ip) {//本地地址无效转向指定html页面
+                                    $ip        = ip($loacladdr[0], $loacladdr[1]);
+                                    if (!$ip) {
                                         $body   = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Web服务错误</title><meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><style>html,body{height:100%%}body{margin:0;padding:0;width:100%%;display:table;font-weight:100;font-family:"Microsoft YaHei",Arial,Helvetica,sans-serif}.container{text-align:center;display:table-cell;vertical-align:middle}.content{border:1px solid #ebccd1;text-align:center;display:inline-block;background-color:#f2dede;color:#a94442;padding:30px}.title{font-size:18px}.copyright{margin-top:30px;text-align:right;color:#000}</style></head><body><div class="container"><div class="content"><div class="title">隧道 %s 无效<br>无法连接到<strong>%s</strong>. 此端口尚未提供Web服务</div><div class="copyright">Powered By natapp.cn</div></div></div></body></html>';
                                         $html   = sprintf($body, $js['Payload']['Url'], $loacladdr[0] . ':' . $loacladdr[1]);
                                         $header = "HTTP/1.0 502 Bad Gateway" . "\r\n";
@@ -208,54 +160,51 @@ while ($recvflag) {
                                         $header .= "Content-Length: %d" . "\r\n";
                                         $header .= "\r\n" . "%s";
                                         $buf    = sprintf($header, strlen($html), $html);
-                                        sendbuf($sock, $buf);
+                                        send_buf($sock, $buf);
                                     } else {
                                         $newsock = connectlocal($ip, $loacladdr[1]);
                                         if ($newsock) {
-                                            $socklist[] = array('sock' => $newsock, 'linkstate' => 0, 'type' => 3, 'tosock' => $sock);
+                                            $box[] = array('sock' => $newsock, 'linkstate' => 0, 'type' => 3, 'tosock' => $sock);
                                         }
                                         //把本地连接覆盖上去
-                                        $sockinfo['tosock']    = $newsock;
-                                        $sockinfo['linkstate'] = 2;
+                                        $info['tosock']    = $newsock;
+                                        $info['linkstate'] = 2;
                                     }
                                 }
                             }
                         }
                         //edit buffer
                         if (strlen($allrecvbut) == (8 + $len)) {
-                            $sockinfo['recvbuf'] = '';
+                            $info['recvbuf'] = '';
                         } else {
-                            $sockinfo['recvbuf'] = substr($allrecvbut, 8 + $len);
+                            $info['recvbuf'] = substr($allrecvbut, 8 + $len);
                         }
-                        $socklist[$k] = $sockinfo;
+                        $box[$index] = $info;
                     }
                 }
-
                 //远程连接已连接本地跟本地连接，纯转发
-                if ($sockinfo['type'] == 3 || ($sockinfo['type'] == 2 && $sockinfo['linkstate'] == 2)) {
-                    sendbuf($sockinfo['tosock'], $sockinfo['recvbuf']);
-                    $sockinfo['recvbuf'] = '';
-                    $socklist[$k]        = $sockinfo;
+                if ($info['type'] == 3 || ($info['type'] == 2 && $info['linkstate'] == 2)) {
+                    send_buf($info['tosock'], $info['recvbuf']);
+                    $info['recvbuf'] = '';
+                    $box[$index]     = $info;
                 }
             }
-
             //可写
-            if (in_array($sock, $writefds)) {
-                if ($sockinfo['linkstate'] == 0) {
-
-                    if ($sockinfo['type'] == 1) {
-                        sendpack($sock, NgrokAuth($options), false);
-                        $sockinfo['linkstate'] = 1;
-                        $socklist[$k]          = $sockinfo;
+            if (in_array($sock, $w)) {
+                if ($info['linkstate'] == 0) {
+                    if ($info['type'] == 1) {
+                        send($sock, NgrokAuth($options), false);
+                        $info['linkstate'] = 1;
+                        $box[$index]       = $info;
                     }
-                    if ($sockinfo['type'] == 2) {
-                        sendpack($sock, RegProxy($ClientId), false);
-                        $sockinfo['linkstate'] = 1;
-                        $socklist[$k]          = $sockinfo;
+                    if ($info['type'] == 2) {
+                        send($sock, RegProxy($client_id), false);
+                        $info['linkstate'] = 1;
+                        $box[$index]       = $info;
                     }
-                    if ($sockinfo['type'] == 3) {
-                        $sockinfo['linkstate'] = 1;
-                        $socklist[$k]          = $sockinfo;
+                    if ($info['type'] == 3) {
+                        $info['linkstate'] = 1;
+                        $box[$index]       = $info;
                     }
                 }
             }
@@ -263,38 +212,18 @@ while ($recvflag) {
     }
 }
 
-/* 域名解析-端口 */
-function dnsopen($seraddr, $port)
+function ip($address, $port)
 {
-    $ip = gethostbyname($seraddr);//解析dns
+    $ip = gethostbyname($address);
     if (!filter_var($ip, FILTER_VALIDATE_IP)) {
+        var_dump($ip);
         return false;
     }
-
-    $fsock = @fsockopen($ip, $port, $errno, $errstr, 3);//检测端口
-    if (!$fsock) {
+    if (empty(fsockopen($ip, $port, $code, $error, 3))) {
+        var_dump($code, $error);
         return false;
     }
     return $ip;
-}
-
-/* 连接到远程 */
-function connectremote($seraddr, $port)
-{
-    global $is_verify_peer;
-    $socket = stream_socket_client('tcp://' . $seraddr . ':' . $port, $errno, $errstr, 30);
-    if (!$socket) {
-        return false;
-    }
-    //设置加密连接，默认是ssl，如果需要tls连接，可以查看php手册stream_socket_enable_crypto函数的解释
-    if ($is_verify_peer == false) {
-        stream_context_set_option($socket, 'ssl', 'verify_host', false);
-        stream_context_set_option($socket, 'ssl', 'verify_peer_name', false);
-        stream_context_set_option($socket, 'ssl', 'verify_peer', false);
-    }
-    stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT);
-    stream_set_blocking($socket, 0); //设置为非阻塞模式
-    return $socket;
 }
 
 /* 连接到本地 */
@@ -348,49 +277,40 @@ function RegProxy($ClientId)
 
 function Ping()
 {
-    $Payload = (object)array();
-    $json    = array(
+    $Payload = (object)[];
+    $str     = json_encode([
         'Type'    => 'Ping',
-        'Payload' => $Payload,
-    );
-    return json_encode($json);
+        'Payload' => (object)[],
+    ]);
+    var_dump($str);
+    return $str;
 }
 
-/* 网络字节序 （只支持整型范围） */
-function lentobyte($len)
+function byte($len): string
 {
-    $xx  = pack("N", $len);
-    $xx1 = pack("C4", 0, 0, 0, 0);
-    return $xx1 . $xx;
+    // 机器字节序 小端 只支持整型范围
+    return pack("L", $len) . pack("C4", 0, 0, 0, 0);
 }
 
-/* 机器字节序 （小端 只支持整型范围） */
-function lentobyte1($len)
+function send($sock, $msg, $block_is = true)
 {
-    $xx  = pack("L", $len);
-    $xx1 = pack("C4", 0, 0, 0, 0);
-    return $xx . $xx1;
-}
-
-function sendpack($sock, $msg, $isblock = true)
-{
-    if ($isblock) {
-        stream_set_blocking($sock, 1); //设置为非阻塞模式
+    if ($block_is) {
+        stream_set_blocking($sock, 1);
     }
-    fwrite($sock, NatApp . phplentobyte1(strlen($msg)) . $msg);
-    if ($isblock) {
-        stream_set_blocking($sock, 0); //设置为非阻塞模式
+    fwrite($sock, byte(strlen($msg)) . $msg);
+    if ($block_is) {
+        stream_set_blocking($sock, 0);
     }
 }
 
-function sendbuf($sock, $buf, $isblock = true)
+function send_buf($sock, $buf, $block_is = true)
 {
-    if ($isblock) {
-        stream_set_blocking($sock, 1); //设置为非阻塞模式
+    if ($block_is) {
+        stream_set_blocking($sock, 1);
     }
     fwrite($sock, $buf);
-    if ($isblock) {
-        stream_set_blocking($sock, 0); //设置为非阻塞模式
+    if ($block_is) {
+        stream_set_blocking($sock, 0);
     }
 }
 
@@ -408,102 +328,78 @@ function tolen1($v)
     return $array[1];
 }
 
-//输出日记到命令行
 function ConsoleOut($log, $level = 'info')
 {
     global $isDebug;
     if ($level == 'debug' and $isDebug == false) {
         return;
     }
-    //cli
-    if (is_cli()) {
-
-
+    if (php_sapi_name() === 'cli') {
         if (DIRECTORY_SEPARATOR == "\\") {
             // $log = iconv('UTF-8', 'GB18030', $log);
         }
 
         echo $log . "\r\n";
-    } //web
-    else {
+    } else {
         echo $log . "<br/>";
         ob_flush();
         flush();
-        // file_put_contents("ngrok.log", date("Y-m-d H:i:s:::") . $log . "\r\n", FILE_APPEND);
     }
 }
 
-//判断是否命令行运行
-function is_cli()
+function auth($token)
 {
-    return (php_sapi_name() === 'cli') ? true : false;
-}
-
-//natapp.cn 获取服务器设置
-function natapp_auth($token)
-{
-    global $is_verify_peer;
     $host = 'auth.natapp.cn';
-    $port = 443;
-
-    $fp = stream_socket_client('tcp://' . $host . ':' . $port, $errno, $errstr, 10);
-    if (!$fp) {
-        ConsoleOut('连接认证服务器: https://auth.natapp.cn 错误.' . $errno . $errstr);
-        sleep(10);
-        exit();
+    $fp   = stream_socket_client("tcp://$host:443", $code, $error, 4);
+    if (empty($fp)) {
+        var_dump($code, $error);
+        exit('认证失败');
     }
-    if ($is_verify_peer == false) {
-        stream_context_set_option($fp, 'ssl', 'verify_host', false);
-        stream_context_set_option($fp, 'ssl', 'verify_peer_name', false);
-        stream_context_set_option($fp, 'ssl', 'verify_peer', false);
-    }
+    stream_context_set_option($fp, 'ssl', 'verify_host', false);
+    stream_context_set_option($fp, 'ssl', 'verify_peer_name', false);
+    stream_context_set_option($fp, 'ssl', 'verify_peer', false);
     stream_socket_enable_crypto($fp, true, STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT);
-
-    $data  = array(
-        'Authtoken'   => $token['authtoken'],
-        'Clienttoken' => $token['clienttoken'],
-        'Token'       => 'fffeephptokenkhd672',
-    );
-    $query = json_encode($data);
-
-    $header = "POST " . "/auth" . " HTTP/1.1" . "\r\n";
-    $header .= "Content-Type: text/html" . "\r\n";
-    $header .= "Host: %s" . "\r\n";
-    $header .= "Content-Length: %d" . "\r\n";
-    $header .= "\r\n" . "%s";
-    $buf    = sprintf($header, $host, strlen($query), $query);
-    $write  = fputs($fp, $buf);
-
+    $payload = json_encode(['Authtoken' => $token['authtoken'], 'Clienttoken' => $token['clienttoken'], 'Token' => 'fffeephptokenkhd672']);
+    $header  = "POST " . "/auth" . " HTTP/1.1" . "\r\n";
+    $header  .= "Content-Type: text/html" . "\r\n";
+    $header  .= "Host: %s" . "\r\n";
+    $header  .= "Content-Length: %d" . "\r\n";
+    $header  .= "\r\n" . "%s";
+    $buf     = sprintf($header, $host, strlen($payload), $payload);
+    var_dump($buf);
+    fputs($fp, $buf);
     $body = null;
-
     while (!feof($fp)) {
         $line = fgets($fp, 1024); //去除请求包的头只显示页面的返回数据
-        // echo $line;
         if ($line == "\n" || $line == "\r\n") {
             $body = fread($fp, 4096);
-            //echo $body;
             break;
-
         }
     }
-
     fclose($fp);
-    $authData = json_decode($body, true);
-    //var_dump($authData);
-    if ($authData['Success'] == false) {
-        ConsoleOut('认证错误:' . $authData['Status'] . ' ErrorCode:' . $authData['Msg']);
-        sleep(10);
-        exit();
+    $pattern = '|"ServerAddr"\s*:\s*"(?<vv>.*?)"|';
+    preg_match($pattern, $body, $matches);
+    $r = $matches['vv'];
+    if (empty($r)) {
+        exit('认证错误');
     }
-    ConsoleOut('认证成功,正在连接服务器...');
-    $proto = explode(':', $authData['Data']['ServerAddr']);
-    return $proto;
+    return explode(':', $r);
 }
 
-//注册退出执行函数
-function shutdown(&$mainsocket)
+function connect($ip, $port)
 {
-    sendpack($mainsocket, 'close');
-    fclose($mainsocket);
+    $r = stream_socket_client("tcp://$ip:$port", $errno, $errstr, 30);
+    if (empty($r)) {
+        exit('error');
+    }
+    stream_context_set_option($r, 'ssl', 'verify_host', false);
+    stream_context_set_option($r, 'ssl', 'verify_peer_name', false);
+    stream_context_set_option($r, 'ssl', 'verify_peer', false);
+    stream_socket_enable_crypto($r, true, STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT);
+    stream_set_blocking($r, 0);
+    register_shutdown_function(function ($r) {
+        send($r, 'close');
+        fclose($r);
+    }, $r);
+    return $r;
 }
-
