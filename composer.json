@@ -1,0 +1,31 @@
+{
+  "name": "langdonglei/php",
+  "require": {
+    "symfony/console": "^5.4",
+    "ext-zip": "*",
+    "nelexa/zip": "*",
+    "ext-json": "*",
+    "guzzlehttp/guzzle": "*",
+    "ext-gd": "*",
+    "ext-mbstring": "*",
+    "workerman/gateway-worker": "^3.1",
+    "jpush/jpush": "^3.6",
+    "symfony/var-dumper": "^5.4"
+  },
+  "config": {
+    "preferred-install": "dist",
+    "allow-plugins": {
+      "easywechat-composer/easywechat-composer": true,
+      "topthink/think-installer": true
+    }
+  },
+  "autoload": {
+    "psr-4": {
+      "langdonglei\\": "src"
+    },
+    "files": [
+    ]
+  },
+  "bin": [
+  ]
+}
